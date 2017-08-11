@@ -1,0 +1,7 @@
+{
+    "access_token": "EAAbQNgyZA7akBAPy4ZCX5yMcQsVQGZAxN61C7Gnt0A5lAs5MegtpzbNVmebSRNtOOZCF2L6gEvCcK1ba7cCxMi09okrq9fsiZAwUzI11kLjUbbcnZAUGHk1X0sV4DrfJSvBZBDTuOxXyalKwGwELw4J1hFmlDErKB9XdeBrBsCXuiqdpRJa7GWz",
+    "post_limit_date": "2010-01-01",
+    "graph_api_version": "v2.10",
+    "webservice_url": "http://localhost:3000/api/posts",
+    "page_id": "160317500766953"
+}
