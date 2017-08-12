@@ -53,7 +53,8 @@ def seek_more_data(data):
     while "next" in paging:
         next_url = paging["next"]
 
-        json_data = requests.get(next_url, stream=True).json()
+        #json_data = requests.get(next_url, stream=True).json()
+        json_data = return_json(next_url)
 
         for json_item in json_data["data"]:
             list_data.append(json_item)
@@ -73,6 +74,17 @@ def read_config_file():
     return data
 
 
+def return_json(url):
+    """
+    Retorna um objeto json da url especificada
+    """
+    for attempt in range(1, 3):
+        try:
+            return requests.get(url).json()
+        except:
+            print('Trying again attempt: ' + str(attempt))
+
+
 def main():
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
@@ -85,99 +97,95 @@ def main():
 
     feed_url = create_url_feed(config)
 
-    feeds = requests.get(feed_url, stream=True).json()
+    feeds = return_json(feed_url)
 
     while True:
-        try:
-            feeds_data = feeds["data"]
-            feeds_paging = feeds["paging"]
+        feeds_data = feeds["data"]
+        feeds_paging = feeds["paging"]
 
-            for feed in feeds_data:
-                post_date = datetime.datetime.strptime(
-                    feed["created_time"], '%Y-%m-%dT%H:%M:%S+0000')
+        for feed in feeds_data:
+            post_date = datetime.datetime.strptime(
+                feed["created_time"], '%Y-%m-%dT%H:%M:%S+0000')
 
-                if post_limit_date.date() > post_date.date():
-                    limit_reached = True
+            if post_limit_date.date() > post_date.date():
+                limit_reached = True
+                break
+
+            print(feed["permalink_url"])
+
+            post_url = create_url_post(feed["id"], config)
+
+            graph_object = return_json(post_url)
+
+            if "error" in graph_object:
+                print(graph_object["error"]["message"])
+                continue
+
+            if "reactions" in graph_object:
+                post_reactions = seek_more_data(graph_object["reactions"])
+
+                for record in post_reactions:
+                    graph_object["reactions"]["data"].append(record)
+
+            if "comments" in graph_object:
+                post_comments = seek_more_data(graph_object["comments"])
+
+                for record in post_comments:
+                    graph_object["comments"]["data"].append(record)
+
+                for pC in graph_object["comments"]["data"]:
+                    if "comments" in pC:
+                        if "paging" in pC["comments"]:
+                            post_comments_of_comments = seek_more_data(
+                                pC["comments"])
+
+                            for post in post_comments_of_comments:
+                                pC["comments"]["data"].append(post)
+
+                    if "reactions" in pC:
+                        if "paging" in pC["reactions"]:
+                            post_reactions_of_comments = seek_more_data(
+                                pC["reactions"])
+
+                            for post in post_reactions_of_comments:
+                                pC["reactions"]["data"].append(post)
+
+                if not "data" in graph_object["comments"]:
                     break
 
-                print(feed["permalink_url"])
-
-                post_url = create_url_post(feed["id"], config)
-
-                graph_object = requests.get(post_url, stream=True).json()
-
-                if "error" in graph_object:
-                    print(graph_object["error"]["message"])
-                    continue
-
-                if "reactions" in graph_object:
-                    post_reactions = seek_more_data(graph_object["reactions"])
-
-                    for record in post_reactions:
-                        graph_object["reactions"]["data"].append(record)
-
-                if "comments" in graph_object:
-                    post_comments = seek_more_data(graph_object["comments"])
-
-                    for record in post_comments:
-                        graph_object["comments"]["data"].append(record)
-
-                    for pC in graph_object["comments"]["data"]:
-                        if "comments" in pC:
-                            if "paging" in pC["comments"]:
-                                post_comments_of_comments = seek_more_data(
-                                    pC["comments"])
-
-                                for post in post_comments_of_comments:
-                                    pC["comments"]["data"].append(post)
-
-                        if "reactions" in pC:
-                            if "paging" in pC["reactions"]:
-                                post_reactions_of_comments = seek_more_data(
-                                    pC["reactions"])
-
-                                for post in post_reactions_of_comments:
-                                    pC["reactions"]["data"].append(post)
-
-                    if not "data" in graph_object["comments"]:
+                for comments in graph_object["comments"]["data"]:
+                    if not "comments" in comments:
                         break
 
-                    for comments in graph_object["comments"]["data"]:
-                        if not "comments" in comments:
+                    for comment_of_comments in comments["comments"]["data"]:
+                        if not "reactions" in comment_of_comments:
                             break
 
-                        for comment_of_comments in comments["comments"]["data"]:
-                            if not "reactions" in comment_of_comments:
-                                break
+                        if not "next" in comment_of_comments["reactions"]["paging"]:
+                            break
 
-                            if not "next" in comment_of_comments["reactions"]["paging"]:
-                                break
+                        comments_of_comments_reactions = seek_more_data(
+                            comment_of_comments["reactions"])
 
-                            comments_of_comments_reactions = seek_more_data(
-                                comment_of_comments["reactions"])
+                        for reactions in comments_of_comments_reactions:
+                            reactions["reactions"]["data"].append(
+                                reactions)
 
-                            for reactions in comments_of_comments_reactions:
-                                reactions["reactions"]["data"].append(
-                                    reactions)
+            result = requests.post(config["webservice_url"],
+                                   data=json.dumps(graph_object), headers=headers)
 
-                result = requests.post(config["webservice_url"],
-                                       data=json.dumps(graph_object), headers=headers, stream=True)
+            print("Http status: " + str(result.status_code))
 
-                print("Http status: " + str(result.status_code))
-
-            if limit_reached:
-                print('Deadline reached')
-                break
-
-            if not "next" in feeds_paging:
-                break
-
-            print('Next page')
-
-            feeds = requests.get(feeds_paging["next"], stream=True).json()
-        except Exception:
-            traceback.print_exc()
+        if limit_reached:
+            print('Deadline reached')
             break
+
+        if not "next" in feeds_paging:
+            break
+
+        print('Next page')
+
+        feeds = return_json(feeds_paging["next"])
 
 
 if __name__ == "__main__":
