@@ -46,14 +46,24 @@ router.get('/pretty', (req, res) => {
 });
 
 router.post('/', (req, res) => {
+  var postId = req.body.id;
+
   var post = new PostModel(req.body);
 
-  post.save((err) => {
-    if (err) {
-      return res.sendStatus(500).send(err.message);
-    } else {
+  post.set("post_id", postId);
+
+  PostModel.findOne({ post_id: postId }, (err, postSaved) => {
+    if (postSaved) {
       return res.sendStatus(200);
-    }
+    };
+
+    post.save((err) => {
+      if (err) {
+        return res.sendStatus(500).send(err.message);
+      } else {
+        return res.sendStatus(200);
+      }
+    });
   });
 });
 
