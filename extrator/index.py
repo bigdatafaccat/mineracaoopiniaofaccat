@@ -53,7 +53,6 @@ def seek_more_data(data):
     while "next" in paging:
         next_url = paging["next"]
 
-        #json_data = requests.get(next_url, stream=True).json()
         json_data = return_json(next_url)
 
         for json_item in json_data["data"]:
@@ -80,7 +79,7 @@ def return_json(url):
     """
     for attempt in range(1, 3):
         try:
-            return requests.get(url).json()
+            return requests.get(url, verify=True, stream=True).json()
         except:
             print('Trying again attempt: ' + str(attempt))
 
@@ -133,22 +132,22 @@ def main():
                 for record in post_comments:
                     graph_object["comments"]["data"].append(record)
 
-                for pC in graph_object["comments"]["data"]:
-                    if "comments" in pC:
-                        if "paging" in pC["comments"]:
+                for comment in graph_object["comments"]["data"]:
+                    if "comments" in comment:
+                        if "paging" in comment["comments"]:
                             post_comments_of_comments = seek_more_data(
-                                pC["comments"])
+                                comment["comments"])
 
                             for post in post_comments_of_comments:
-                                pC["comments"]["data"].append(post)
+                                comment["comments"]["data"].append(post)
 
-                    if "reactions" in pC:
-                        if "paging" in pC["reactions"]:
+                    if "reactions" in comment:
+                        if "paging" in comment["reactions"]:
                             post_reactions_of_comments = seek_more_data(
-                                pC["reactions"])
+                                comment["reactions"])
 
                             for post in post_reactions_of_comments:
-                                pC["reactions"]["data"].append(post)
+                                comment["reactions"]["data"].append(post)
 
                 if not "data" in graph_object["comments"]:
                     break
@@ -168,7 +167,7 @@ def main():
                             comment_of_comments["reactions"])
 
                         for reactions in comments_of_comments_reactions:
-                            reactions["reactions"]["data"].append(
+                            comment_of_comments["reactions"]["data"].append(
                                 reactions)
 
             result = requests.post(config["webservice_url"],
