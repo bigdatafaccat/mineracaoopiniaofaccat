@@ -30,6 +30,10 @@ def create_url_feed(config):
     """
     Cria a url dos feeds da página
     """
+    text_until = ""
+    if (config["until"] != ""):
+        text_until = "&until=" + config["until"]
+
     text = "https://graph.facebook.com/"
     text += config["graph_api_version"]
     text += "/"
@@ -38,6 +42,7 @@ def create_url_feed(config):
     text += "feed?fields=created_time,id,permalink_url"
     text += "&access_token="
     text += config["access_token"]
+    text += text_until
 
     return text
 
