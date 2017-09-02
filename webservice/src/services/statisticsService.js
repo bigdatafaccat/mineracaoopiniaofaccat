@@ -1,44 +1,87 @@
 const calculate = posts => {
     const data = calculateAmounts(posts);
 
-    calculateCommentsMean(data);
-    calculateReactionsMean(data);
-    calculatePeopleInvolved(data);
+    const result = {};
 
-    return data;
-};
-
-const calculateMedian = posts => {
-    // TODO
-};
-
-const calculatePeopleInvolved = data => {
     for (const group in data) {
-        data[group].peopleInvolved = [...new Set(data[group].peopleInvolved)].length;
+        result[group] = defaultResultStructure();
+    }
+
+    calculateCommentsMean(data, result);
+    calculateReactionsMean(data, result);
+    calculatePeopleInvolved(data, result);
+    calculateCommentsMedian(data, result);
+    calculateReactionsMedian(data, result);
+
+    return result;
+};
+
+const calculateCommentsMedian = (data, result) => {
+    for (const group in data) {
+        const list = [];
+
+        data[group].map(x => {
+            list.push(x.comments);
+        });
+
+        result[group].commentsMedian = calculateMedian(list);
     }
 };
 
-const calculateCommentsMean = data => {
+const calculateReactionsMedian = (data, result) => {
     for (const group in data) {
-        const posts = data[group].posts;
-        const comments = data[group].comments;
+        const list = [];
 
-        data[group].commentsMean = comments / posts;
+        data[group].map(x => {
+            list.push(x.reactions);
+        });
+
+        result[group].reactionsMedian = calculateMedian(list);
     }
 };
 
-const calculateReactionsMean = data => {
-    for (const group in data) {
-        const posts = data[group].posts;
-        const reactions = data[group].reactions;
+const calculateMedian = list => {
+    list = list.sort(function (a, b) { return a - b; });
 
-        data[group].WOW_Mean = reactions.WOW / posts;
-        data[group].SAD_Mean = reactions.SAD / posts;
-        data[group].LIKE_Mean = reactions.LIKE / posts;
-        data[group].ANGRY_Mean = reactions.ANGRY / posts;
-        data[group].LOVE_Mean = reactions.LOVE / posts;
-        data[group].HAHA_Mean = reactions.HAHA / posts;
-        data[group].PRIDE_Mean = reactions.PRIDE / posts;
+    const i = list.length / 2;
+
+    return i % 1 === 0 ? (list[i - 1] + list[i]) / 2 : list[Math.floor(i)];
+};
+
+const calculatePeopleInvolved = (data, result) => {
+    for (const group in data) {
+        const peopleInvolved = [];
+
+        data[group].map(x => {
+            x.peopleInvolved.map(person => {
+                peopleInvolved.push(person)
+            });
+        });
+
+        result[group].peopleInvolved = [...new Set(peopleInvolved)].length;
+    }
+};
+
+const calculateCommentsMean = (data, result) => {
+    for (const group in data) {
+        data[group].map(x => {
+            result[group].postsAmount += 1;
+            result[group].commentsAmount += x.comments;
+        });
+
+        result[group].commentsMean = result[group].commentsAmount / result[group].postsAmount;
+    }
+};
+
+const calculateReactionsMean = (data, result) => {
+    for (const group in data) {
+        for (const group in data) {
+            data[group].map(x => {
+                result[group].reactionsAmount += x.reactions;
+            });
+
+            result[group].reactionsMean = result[group].reactionsAmount / result[group].postsAmount;
+        }
     }
 };
 
@@ -51,15 +94,19 @@ const calculateAmounts = posts => {
 
         const groupName = post.target.name;
 
-        data[groupName] = data[groupName] || defaultStructure();
-        data[groupName].posts += 1;
-        data[groupName].peopleInvolved.push(post.from.id);
+        data[groupName] = data[groupName] || [];
+
+        const currentPost = defaultPostStructure();
+
+        data[groupName].push(currentPost);
+
+        currentPost.peopleInvolved.push(post.from.id);
 
         // Reações do post
         if (post.reactions && post.reactions.data) {
             post.reactions.data.map(reaction => {
-                data[groupName].reactions[reaction.type] += 1;
-                data[groupName].peopleInvolved.push(reaction.id);
+                currentPost.reactions += 1;
+                currentPost.peopleInvolved.push(reaction.id);
             });
         }
 
@@ -69,7 +116,7 @@ const calculateAmounts = posts => {
         }
 
         post.comments.data.map(comment => {
-            data[groupName].comments += comment.comment_count + 1;
+            currentPost.comments += comment.comment_count + 1;
 
             if (!comment.comments || !comment.comments.data) {
                 return;
@@ -77,8 +124,8 @@ const calculateAmounts = posts => {
 
             comment.comments.data.map(commentOfComment => {
                 // Comentário do comentário
-                data[groupName].comments += 1;
-                data[groupName].peopleInvolved.push(commentOfComment.from.id);
+                currentPost.comments += 1;
+                currentPost.peopleInvolved.push(commentOfComment.from.id);
 
                 if (!commentOfComment.reactions) {
                     return;
@@ -86,8 +133,8 @@ const calculateAmounts = posts => {
 
                 // Reações do cometário do comentário
                 commentOfComment.reactions.data.map(reaction => {
-                    data[groupName].reactions[reaction.type] += 1;
-                    data[groupName].peopleInvolved.push(reaction.id);
+                    currentPost.reactions += 1;
+                    currentPost.peopleInvolved.push(reaction.id);
                 });
             });
         });
@@ -96,21 +143,25 @@ const calculateAmounts = posts => {
     return data;
 };
 
-const defaultStructure = () => {
+const defaultResultStructure = () => {
     return {
-        posts: 0,
-        comments: 0,
-        peopleInvolved: [],
-        reactions: {
-            WOW: 0,
-            SAD: 0,
-            LIKE: 0,
-            ANGRY: 0,
-            LOVE: 0,
-            HAHA: 0,
-            PRIDE: 0 /* Pride é uma bandeira listrada colorida */
-        }
+        postsAmount: 0,
+        commentsAmount: 0,
+        commentsMean: 0,
+        commentsMedian: 0,
+        reactionsAmount: 0,
+        reactionsMean: 0,
+        reactionsMedian: 0,
+        peopleInvolved: 0
     };
+};
+
+const defaultPostStructure = () => {
+    return {
+        comments: 0,
+        reactions: 0,
+        peopleInvolved: []
+    }
 };
 
 module.exports = { calculate }
