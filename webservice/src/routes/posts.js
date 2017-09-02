@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const path = require('path');
 const config = require('../db');
 
+const statisticsService = require('../services/statisticsService');
+
 mongoose.Promise = Promise;
 
 const mongoConnect = () => {
@@ -26,36 +28,55 @@ const anySchema = new mongoose.Schema({}, { strict: false });
 const PostModel = mongoose.model('posts', anySchema);
 
 router.get('/', (req, res) => {
-  PostModel.find({}).exec(function (err, posts) {
+  PostModel.find({}).exec((err, posts) => {
     const postsJSON = posts.map((post) => {
       return post.toJSON();
     });
 
-    res.send({ data: postsJSON });
+    return res.send({ data: postsJSON });
   });
 });
 
 router.get('/pretty', (req, res) => {
-  PostModel.find({}).exec(function (err, posts) {
+  PostModel.find({}).exec((err, posts) => {
     const postsJSON = posts.map((post) => {
       return post.toJSON();
     });
 
-    res.render("index", { data: postsJSON });
+    return res.render("index", { data: postsJSON });
+  });
+});
+
+router.get('/statistics', (req, res) => {
+  let filter = {};
+
+  if (Object.keys(req.query).length !== 0) {
+    filter = {
+      "created_time": {
+        "$gte": req.query.startdate,
+        "$lt": req.query.enddate
+      }
+    };
+  }
+
+  PostModel.find(filter).exec((err, posts) => {
+    const data = statisticsService.calculate(posts);
+
+    return res.send({ data });
   });
 });
 
 router.post('/', (req, res) => {
-  var postId = req.body.id;
+  const postId = req.body.id;
 
-  var post = new PostModel(req.body);
+  const post = new PostModel(req.body);
 
   post.set("post_id", postId);
 
   PostModel.findOne({ post_id: postId }, (err, postSaved) => {
     if (postSaved) {
       return res.sendStatus(200);
-    };
+    }
 
     post.save((err) => {
       if (err) {
@@ -70,9 +91,9 @@ router.post('/', (req, res) => {
 router.delete('/', (req, res) => {
   PostModel.remove({ _id: req.body.id }, (err) => {
     if (err) {
-      res.sendStatus(500).send(err.message);
+      return res.sendStatus(500).send(err.message);
     } else {
-      res.sendStatus(200);
+      return res.sendStatus(200);
     }
   });
 });
@@ -80,9 +101,9 @@ router.delete('/', (req, res) => {
 router.delete('/deleteAll', (req, res) => {
   PostModel.remove({}, (err) => {
     if (err) {
-      res.sendStatus(500).send(err.message);
+      return res.sendStatus(500).send(err.message);
     } else {
-      res.sendStatus(200);
+      return res.sendStatus(200);
     }
   });
 });
