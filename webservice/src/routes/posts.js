@@ -8,7 +8,7 @@ const statisticsService = require('../services/statisticsService');
 mongoose.Promise = Promise;
 
 const mongoConnect = () => {
-  mongoose.connect(config.db.mongo, (err, res) => {
+  mongoose.connection.openUri(config.db.mongo, (err, res) => {
     if (err) {
       console.log('Failed: ' + err);
     } else {
