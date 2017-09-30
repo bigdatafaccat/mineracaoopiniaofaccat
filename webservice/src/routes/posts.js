@@ -4,6 +4,7 @@ const path = require('path');
 const config = require('../db');
 
 const statisticsService = require('../services/statisticsService');
+const PostModel = require('../models/post.js');
 
 mongoose.Promise = Promise;
 
@@ -23,9 +24,6 @@ mongoose.connection.on('disconnected', mongoConnect);
 mongoConnect();
 
 const router = express.Router();
-
-const anySchema = new mongoose.Schema({}, { strict: false });
-const PostModel = mongoose.model('posts', anySchema);
 
 router.get('/', (req, res) => {
   PostModel.find({}).exec((err, posts) => {
