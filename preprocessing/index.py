@@ -1,7 +1,8 @@
 import nltk
 from nltk.corpus import floresta
 import sys
-
+import requests
+import json
 
 nltk.download('floresta')
 
@@ -33,7 +34,7 @@ def retrieveTrainData():
     return tsents
 
 
-def wordProcessing(phrases):
+def createTagger():
     traindata = retrieveTrainData()
 
     tagger1 = nltk.DefaultTagger('n')
@@ -46,20 +47,31 @@ def wordProcessing(phrases):
     tagger6 = nltk.BrillTaggerTrainer(tagger5, templates)
     tagger6 = tagger6.train(traindata)
 
-    list_tagged_words = []
-
-    for phrase in phrases:
-        words = phrase.split(' ')
-        list_tagged_words.append(tagger6.tag(words))
-
-    return list_tagged_words
+    return tagger6
 
 
-phrases = ['nos iremos ao cinema mais tarde',
-           'hoje e um lindo dia']
+def main():
+    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+
+    posts = getPosts()
+    tagger = createTagger()
+
+    for post in posts["data"]:
+        words = post["message_description"].split(' ')
+
+        data = {
+            "post_id": post["post_id"],
+            "words_tagged": tagger.tag(words)
+        }
+
+        result = requests.post("http://localhost:3000/api/preprocessing/fase2",
+                               data=json.dumps(data), headers=headers)
+        print(result.status_code)
+
+
+def getPosts():
+    return requests.get("http://localhost:3000/api/posts").json()
+
 
 if __name__ == "__main__":
-    #result = wordProcessing(sys.argv[1:])
-    result = wordProcessing(phrases)
-
-    print(result)
+    main()
