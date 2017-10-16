@@ -1,10 +1,62 @@
+import json
 import nltk
 from nltk.corpus import floresta
-import sys
+from string import punctuation
 import requests
-import json
 
 nltk.download('floresta')
+
+
+def convert_to_universal_tag(tag):
+    tagdict = {
+        'n': "NOUN",
+        'num': "NUM",
+        'v-fin': "VERB",
+        'v-inf': "VERB",
+        'v-ger': "VERB",
+        'v-pcp': "VERB",
+        'pron-det': "PRON",
+        'pron-indp': "PRON",
+        'pron-pers': "PRON",
+        'art': "DET",
+        'adv': "ADV",
+        'conj-s': "CONJ",
+        'conj-c': "CONJ",
+        'conj-p': "CONJ",
+        'adj': "ADJ",
+        'ec': "PRT",
+        'pp': "ADP",
+        'prp': "ADP",
+        'prop': "NOUN",
+        'pro-ks-rel': "PRON",
+        'proadj': "PRON",
+        'prep': "ADP",
+        'nprop': "NOUN",
+        'vaux': "VERB",
+        'propess': "PRON",
+        'v': "VERB",
+        'vp': "VERB",
+        'in': "X",
+        'prp-': "ADP",
+        'adv-ks': "ADV",
+        'dad': "NUM",
+        'prosub': "PRON",
+        'tel': "NUM",
+        'ap': "NUM",
+        'est': "NOUN",
+        'cur': "X",
+        'pcp': "VERB",
+        'pro-ks': "PRON",
+        'hor': "NUM",
+        'pden': "ADV",
+        'dat': "NUM",
+        'kc': "ADP",
+        'ks': "ADP",
+        'adv-ks-rel': "ADV",
+        'npro': "NOUN",
+    }
+
+    return tagdict.get(tag, "." if all(tt in punctuation for tt in tag) else tag)
 
 
 def simplify_tag(t):
@@ -26,18 +78,21 @@ patterns = [
 ]
 
 
-def retrieveTrainData():
+def retrieve_traindata():
     tsents = floresta.tagged_sents()
+
     tsents = [[(w.lower(), simplify_tag(t)) for (w, t) in sent]
+              for sent in tsents if sent]
+    tsents = [[(w.lower(), convert_to_universal_tag(t)) for (w, t) in sent]
               for sent in tsents if sent]
 
     return tsents
 
 
-def createTagger():
-    traindata = retrieveTrainData()
+def create_tagger():
+    traindata = retrieve_traindata()
 
-    tagger1 = nltk.DefaultTagger('n')
+    tagger1 = nltk.DefaultTagger('NOUN')
     tagger2 = nltk.AffixTagger(traindata, backoff=tagger1)
     tagger3 = nltk.UnigramTagger(traindata, backoff=tagger2)
     tagger4 = nltk.RegexpTagger(patterns, backoff=tagger3)
@@ -51,10 +106,11 @@ def createTagger():
 
 
 def main():
-    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    headers = {'Content-type': 'application/json'}
+    url = "http://localhost:3000/api/preprocessing/fase2"
 
-    posts = getPosts()
-    tagger = createTagger()
+    posts = get_posts()
+    tagger = create_tagger()
 
     for post in posts["data"]:
         words = post["message_description"].split(' ')
@@ -64,13 +120,15 @@ def main():
             "words_tagged": tagger.tag(words)
         }
 
-        result = requests.post("http://localhost:3000/api/preprocessing/fase2",
-                               data=json.dumps(data), headers=headers)
-        print(result.status_code)
+        result = requests.post(url, data=json.dumps(data), headers=headers)
+
+        print("Http status: " + str(result.status_code))
 
 
-def getPosts():
-    return requests.get("http://localhost:3000/api/posts").json()
+def get_posts():
+    url = "http://localhost:3000/api/posts"
+
+    return requests.get(url).json()
 
 
 if __name__ == "__main__":
