@@ -3,6 +3,7 @@ import nltk
 from nltk.corpus import floresta
 from string import punctuation
 import requests
+import re
 
 nltk.download('floresta')
 
@@ -113,11 +114,15 @@ def main():
     tagger = create_tagger()
 
     for post in posts["data"]:
-        words = post["message_description"].split(' ')
+        message = post["message_description"]
+
+        words = message.split(' ')
+        sentences = re.split('[?.,!:;]', message)
 
         data = {
             "post_id": post["post_id"],
-            "words_tagged": tagger.tag(words)
+            "words_tagged": tagger.tag(words),
+            "sentences": sentences
         }
 
         result = requests.post(url, data=json.dumps(data), headers=headers)

@@ -34,6 +34,7 @@ router.post('/fase2', (req, res) => {
 
   PostModel.findOne({ post_id: postId }, (err, postSaved) => {
     postSaved.set('words_tagged', req.body.words_tagged);
+    postSaved.set('sentences', req.body.sentences);
 
     postSaved.save((err) => {
       if (err) {
