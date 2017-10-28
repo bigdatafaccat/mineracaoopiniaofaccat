@@ -4,6 +4,7 @@ from nltk.corpus import floresta
 from string import punctuation
 import requests
 import re
+import emoji
 
 nltk.download('floresta')
 
@@ -117,12 +118,25 @@ def main():
         message = post["message_description"]
 
         words = message.split(' ')
-        sentences = re.split('[?.,!:;]', message)
+
+        sentences = re.split('[?.!;]', message)
+        sentence_words = []
+        sentence_tagged = []
+        list_sentences = []
+
+        for sentence in sentences:
+            # Convertemos o emoji para representação em texto
+            sentence_demojized = emoji.demojize(sentence)
+
+            sentence_words = sentence_demojized.split(' ')
+            sentence_tagged = tagger.tag(sentence_words)
+
+            list_sentences.append([sentence, sentence_tagged])
 
         data = {
             "post_id": post["post_id"],
             "words_tagged": tagger.tag(words),
-            "sentences": sentences
+            "sentences": list_sentences
         }
 
         result = requests.post(url, data=json.dumps(data), headers=headers)

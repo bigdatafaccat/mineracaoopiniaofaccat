@@ -15,7 +15,7 @@ router.get('/fase1', (req, res) => {
       }
 
       if (postJSON.description) {
-        messageDescription += (messageDescription ? '_' : '') + postJSON.description;
+        messageDescription += (messageDescription ? '. ' : '') + postJSON.description;
       }
 
       post.set("message_description", messageDescription);
