@@ -123,6 +123,7 @@ def main():
         sentence_words = []
         sentence_tagged = []
         list_sentences = []
+        identifier = 0
 
         for sentence in sentences:
             # Convertemos o emoji para representação em texto
@@ -131,7 +132,8 @@ def main():
             sentence_words = sentence_demojized.split(' ')
             sentence_tagged = tagger.tag(sentence_words)
 
-            list_sentences.append([sentence, sentence_tagged])
+            identifier += 1
+            list_sentences.append([identifier, sentence, sentence_tagged])
 
         data = {
             "post_id": post["post_id"],
