@@ -1,9 +1,5 @@
-link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css", crossorigin="anonymous")
-
 title #{"Records: " + data.length}
 
-each x in data
-    .panel.panel-default
-        .panel-heading
-            h3.panel-title #{x.message}
-        .panel-body #{JSON.stringify(x)}
+ul
+    each post in data
+        li(style='padding: 5px') #{post.message} - #{post.post_id}
