@@ -20,5 +20,11 @@ Route::get('login/google', 'Auth\LoginController@redirectToProvider');
 Route::get('login/google/callback', 'Auth\LoginController@handleProviderCallback');
 
 Auth::routes();
+Route::get('login', 'Auth\LoginController@redirectToProvider');
 
-Route::get('/home', 'HomeController@index')->name('home');
+//Route::get('/home', 'HomeController@index')->name('home');
+
+
+Route::get('/home', 'AnotacaoController@exibirSentenca')->name('anotacao')->middleware('auth');
+Route::get('/anotacao', 'AnotacaoController@exibirSentenca')->name('anotacao')->middleware('auth');
+Route::get('/anotar', 'AnotacaoController@registrarAnotacao')->name('anotar')->middleware('auth');
