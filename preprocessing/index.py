@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 import nltk
 from nltk.corpus import floresta
@@ -6,7 +8,7 @@ import requests
 import re
 import emoji
 
-nltk.download('floresta')
+# nltk.download('floresta')
 
 
 def convert_to_universal_tag(tag):
@@ -115,39 +117,68 @@ def main():
     tagger = create_tagger()
 
     for post in posts["data"]:
-        message = post["message_description"]
+        message_description = post["message_description"]
 
-        words = message.split(' ')
+        sentences = []
+        comments = []
+        post_identifier = 0
+        comment_identifier = 0
 
-        sentences = re.split('[?.!;]', message)
-        sentence_words = []
-        sentence_tagged = []
-        list_sentences = []
-        identifier = 0
+        post_sentences = re.split('[?.!;]', message_description)
 
-        for sentence in sentences:
-            # Convertemos o emoji para representaÃ§Ã£o em texto
-            sentence_demojized = emoji.demojize(sentence)
+        for post_sentence in post_sentences:
+            # Convertemos o emoji para representação em texto
+            sentence_demojized = emoji.demojize(post_sentence)
 
             sentence_words = sentence_demojized.split(' ')
             sentence_tagged = tagger.tag(sentence_words)
 
-            identifier += 1
-            list_sentences.append([identifier, sentence, sentence_tagged])
+            post_identifier += 1
+            sentences.append([post_identifier, post_sentence, sentence_tagged])
+
+        if "comments" in post:
+            for comment_data in post["comments"]["data"]:
+                message = comment_data["message"]
+
+                comment = []
+                comment_words = message.split(' ')
+                comment_tagged = tagger.tag(comment_words)
+                comment_sentences = re.split('[?.!;]', message)
+
+                for comment_sentence in comment_sentences:
+                    comment_sentence_demojized = emoji.demojize(
+                        comment_sentence)
+
+                    comment_sentence_words = comment_sentence_demojized.split(
+                        ' ')
+                    comment_sentence_tagged = tagger.tag(
+                        comment_sentence_words)
+
+                    comment_identifier += 1
+                    comment.append(
+                        [comment_identifier, comment_sentence, comment_sentence_tagged])
+
+                comments.append({"id": comment_data["id"],
+                                 "comment_tagged": comment_tagged,
+                                 "comment_sentences": comment})
+
+        post_message_words = message_description.split(' ')
 
         data = {
             "post_id": post["post_id"],
-            "words_tagged": tagger.tag(words),
-            "sentences": list_sentences
+            "words_tagged": tagger.tag(post_message_words),
+            "sentences": sentences,
+            "comments": comments
         }
 
         result = requests.post(url, data=json.dumps(data), headers=headers)
 
-        print("Http status: " + str(result.status_code))
+        print("Http status: " + str(result.status_code) +
+              " PostID: " + post["post_id"])
 
 
 def get_posts():
-    url = "http://localhost:3000/api/posts"
+    url = "http://localhost:3000/api/posts/pieces?startdate=2010-01-01&enddate=2013-01-01"
 
     return requests.get(url).json()
 

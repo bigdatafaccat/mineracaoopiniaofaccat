@@ -35,6 +35,27 @@ router.get('/', (req, res) => {
   });
 });
 
+router.get('/pieces', (req, res) => {
+  let filter = {};
+
+  if (Object.keys(req.query).length !== 0) {
+    filter = {
+      "created_time": {
+        "$gte": req.query.startdate,
+        "$lte": req.query.enddate
+      }
+    };
+  }
+
+  PostModel.find(filter).exec((err, posts) => {
+    const postsJSON = posts.map((post) => {
+      return post.toJSON();
+    });
+
+    return res.send({ data: postsJSON });
+  });
+});
+
 router.get('/pretty', (req, res) => {
   PostModel.find({}).exec((err, posts) => {
     const postsJSON = posts.map((post) => {
