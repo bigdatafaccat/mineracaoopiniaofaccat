@@ -15,7 +15,10 @@ class Anotacao extends Migration
     {
         Schema::create('sentenca', function (Blueprint $table) {
             $table->increments('idsentenca');
-            $table->string('identificador');
+            $table->string('post_id');
+            $table->string('sentenca_id');
+            $table->string('grupo_id');
+            $table->string('mongo_id');
             $table->text('texto');
             $table->timestamps();
         });

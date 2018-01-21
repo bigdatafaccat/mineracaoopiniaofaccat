@@ -58,49 +58,49 @@
             <div class="col-md-2">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="assunto_saude"> Saúde
+                        <input type="checkbox" name="assunto_saude" value="t"> Saúde
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="assunto_educacao"> Educação
+                        <input type="checkbox" name="assunto_educacao" value="t"> Educação
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="assunto_seguranca"> Segurança
+                        <input type="checkbox" name="assunto_seguranca" value="t"> Segurança
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="assunto_meioambiente"> Meio ambiente
+                        <input type="checkbox" name="assunto_meioambiente" value="t"> Meio ambiente
                     </label>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="assunto_emprego"> Emprego
+                        <input type="checkbox" name="assunto_emprego" value="t"> Emprego
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="assunto_politica"> Política
+                        <input type="checkbox" name="assunto_politica" value="t"> Política
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="assunto_nenhum"> Nenhum
+                        <input type="checkbox" name="assunto_nenhum" value="t"> Nenhum
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="assunto_naosei"> Não sei
+                        <input type="checkbox" name="assunto_naosei" value="t"> Não sei
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="assunto_outro"> Outro
+                        <input type="checkbox" name="assunto_outro" value="t"> Outro
                     </label>
                 </div>
             </div>
@@ -115,32 +115,32 @@
             <div class="col-md-2">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_alegria"> Alegria
+                        <input type="checkbox" name="sentimento_alegria" value="t"> Alegria
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_surpresa"> Surpresa
+                        <input type="checkbox" name="sentimento_surpresa" value="t"> Surpresa
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_medo"> Medo
+                        <input type="checkbox" name="sentimento_medo" value="t"> Medo
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_tristeza"> Tristeza
+                        <input type="checkbox" name="sentimento_tristeza" value="t"> Tristeza
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_raiva"> Raiva
+                        <input type="checkbox" name="sentimento_raiva" value="t"> Raiva
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_repugnancia"> Repugnância
+                        <input type="checkbox" name="sentimento_repugnancia" value="t"> Repugnância
                     </label>
                 </div>
             </div>
@@ -148,35 +148,42 @@
 
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_confianca"> Confiança
+                        <input type="checkbox" name="sentimento_confianca" value="t"> Confiança
                     </label>
                 </div>
 
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_politica"> Expectativa
+                        <input type="checkbox" name="sentimento_expectativa" value="t"> Expectativa
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_nenhum"> Nenhum
+                        <input type="checkbox" name="sentimento_nenhum" value="t"> Nenhum
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_naosei"> Não sei
+                        <input type="checkbox" name="sentimento_naosei" value="t"> Não sei
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="sentimento_outro"> Outro
+                        <input type="checkbox" name="sentimento_outro" value="t"> Outro
                     </label>
                 </div>
             </div>
         </div>
 
+        <hr />
 
-
+        <div>
+            <button class="btn btn-default" type="submit" name="botao" value="ok">Enviar</button>
+            <button class="btn btn-default" type="submit" name="botao" value="pular">Pular pergunta</button>
+            <button class="btn btn-default" type="submit" name="botao" value="cancelar">Cancelar</button>
+        </div>
     </div>
+    <hr />
+    <br />
 </form>
 @endsection

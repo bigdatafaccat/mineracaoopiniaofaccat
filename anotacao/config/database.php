@@ -67,6 +67,18 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'mongodb' => [
+            'driver'   => 'mongodb',
+            'host'     => '192.168.1.18',
+            'port'     => 27017,
+            'database' => 'zeta'
+            /*'username' => env('DB_USERNAME'),
+            'password' => env('DB_PASSWORD'),
+            'options'  => [
+                'database' => 'admin' // sets the authentication database required by mongo 3
+            ]*/
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'host' => env('DB_HOST', 'localhost'),
