@@ -24,6 +24,18 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereTexto($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string|null $comentario_id
+ * @property int|null $comentario_sentenca_id
+ * @property string|null $tipo_texto
+ * @property string $post_texto
+ * @property string|null $comentario_texto
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioSentencaId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioTexto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePostTexto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereTipoTexto($value)
+ * @property string|null $post_datahora
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePostDatahora($value)
  */
 class Sentenca extends Model
 {
