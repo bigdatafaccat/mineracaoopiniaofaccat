@@ -17,8 +17,8 @@ class AnotacaoController extends Controller
         $max = Sentenca::max('idsentenca');
         $random = rand($min, $max);
 
-        //$teste = DB::connection('mongodb')->collection('posts')->take(1)->get();
-        //var_dump($teste);
+        $teste = DB::connection('mongodb')->collection('posts')->take(1)->get();
+        var_dump($teste);
 
         /*Regras para apresentar anotação de sentenças
 
