@@ -69,7 +69,7 @@ return [
 
         'mongodb' => [
             'driver'   => 'mongodb',
-            'host'     => '192.168.1.18',
+            'host'     => '192.168.10.1',
             'port'     => 27017,
             'database' => 'zeta'
             /*'username' => env('DB_USERNAME'),

@@ -60,6 +60,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Anotacao whereSentimentoTristeza($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Anotacao whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property bool|null $pular
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Anotacao wherePular($value)
  */
 class Anotacao extends Model
 {

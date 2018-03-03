@@ -14,7 +14,7 @@ class Anotacao extends Migration
     public function up()
     {
         Schema::create('sentenca', function (Blueprint $table) {
-            $table->increments('idsentenca');
+            $table->bigIncrements('idsentenca');
             $table->string('post_id');
             $table->string('sentenca_id');
             $table->string('grupo_id');
@@ -24,8 +24,8 @@ class Anotacao extends Migration
         });
 
         Schema::create('anotacao', function (Blueprint $table) {
-            $table->increments('idanotacao');
-            $table->integer('idsentenca');
+            $table->bigIncrements('idanotacao');
+            $table->bigInteger('idsentenca');
             $table->integer('idusuario');
             $table->string('opiniao')->nullable();
 

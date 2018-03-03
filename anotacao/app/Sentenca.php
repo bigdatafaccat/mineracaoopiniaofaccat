@@ -24,6 +24,36 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereTexto($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string|null $comentario_id
+ * @property int|null $comentario_sentenca_id
+ * @property string|null $tipo_texto
+ * @property string $post_texto
+ * @property string|null $comentario_texto
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioSentencaId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioTexto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePostTexto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereTipoTexto($value)
+ * @property string|null $post_datahora
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePostDatahora($value)
+ * @property int|null $comentario_comentario_id
+ * @property int|null $comentario_comentario_sentenca_id
+ * @property string|null $comentario_comentario_texto
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioComentarioId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioComentarioSentencaId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioComentarioTexto($value)
+ * @property string|null $post_autor_id
+ * @property string|null $post_autor_name
+ * @property string|null $comentario_autor_id
+ * @property string|null $comentario_autor_name
+ * @property string|null $comentario_comentario_autor_id
+ * @property string|null $comentario_comentario_autor_name
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioAutorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioAutorName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioComentarioAutorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioComentarioAutorName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePostAutorId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePostAutorName($value)
  */
 class Sentenca extends Model
 {

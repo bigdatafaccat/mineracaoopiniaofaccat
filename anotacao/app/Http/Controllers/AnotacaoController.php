@@ -17,9 +17,22 @@ class AnotacaoController extends Controller
         $max = Sentenca::max('idsentenca');
         $random = rand($min, $max);
 
+        $teste = DB::connection('mongodb')->collection('posts')->take(1)->get();
+        var_dump($teste);
 
-        $string = "idsentenca not in (select x.idsentenca from anotacao x where x.idusuario <> ?)
-               and idsentenca > ?";
+        /*Regras para apresentar anotação de sentenças
+
+        1 - Pessoas anotarão sentenças
+        2 - Cada sentença será anotada por no mínimo 2 pessoas
+        3 - Enquanto duas pessoas não concordarem com a anotação da sentença, ela será candidata a nova anotação
+
+
+        */
+
+        $string = "idsentenca not in (select x.idsentenca from anotacao x where x.idusuario = ?)
+               and idsentenca > ?
+               and post_datahora::date >= '2017-01-01'::date
+               and post_datahora::date <= '2017-07-01'::date";
         $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $random])->first();
         return view('anotacao', ['sentenca' => $sentenca]);
     }
