@@ -40,6 +40,8 @@ class ImportacaoMongoSeeder extends Seeder
                             $sentenca->tipo_texto = "post";
                             $sentenca->post_autor_id = $post['from']['id'];
                             $sentenca->post_autor_name = $post['from']['name'];
+                            $sentenca->similar_outra = false;
+                            $sentenca->similaridade_analisada = false;
                             $sentenca->save();
                             //part of speech
                             if (isset($post_sentenca[2])) {
@@ -107,6 +109,8 @@ class ImportacaoMongoSeeder extends Seeder
                                     $sentenca->post_autor_name = $post['from']['name'];
                                     $sentenca->comentario_autor_id = $comentario['from']['id'];
                                     $sentenca->comentario_autor_name = $comentario['from']['name'];
+                                    $sentenca->similar_outra = false;
+                                    $sentenca->similaridade_analisada = false;
                                     $sentenca->save();
                                     //part of speech
                                     if (isset($comentario_sentenca[2])) {
@@ -153,6 +157,8 @@ class ImportacaoMongoSeeder extends Seeder
                                                 $sentenca->comentario_autor_name = $comentario['from']['name'];
                                                 $sentenca->comentario_comentario_autor_id = $comentario_comentario['from']['id'];
                                                 $sentenca->comentario_comentario_autor_name = $comentario_comentario['from']['name'];
+                                                $sentenca->similar_outra = false;
+                                                $sentenca->similaridade_analisada = false;
                                                 $sentenca->save();
                                                 //part of speech
                                                 if (isset($comentario_comentario_sentenca[2])) {

@@ -29,12 +29,14 @@ class ComentarioComentario extends Migration
             $table->string('comentario_comentario_autor_id')->nullable();
             $table->string('comentario_comentario_autor_name')->nullable();
             $table->text('comentario_comentario_texto')->nullable();
+            $table->boolean('similar_outra');
+            $table->boolean('similaridade_analisada');
         });
 
         Schema::create('part_of_speech', function (Blueprint $table) {
             $table->bigIncrements('idpart_of_speech');
             $table->bigInteger('idsentenca');
-            $table->string('termo');
+            $table->text('termo');
             $table->string('pos');
             $table->timestamps();
         });
@@ -49,6 +51,13 @@ class ComentarioComentario extends Migration
             $table->string('tipo'); //post, comentario, comentario de comentario
             $table->timestamps();
         });
+
+        Schema::create('similaridade', function (Blueprint $table) {
+            $table->bigIncrements('idsimilaridade');
+            $table->bigInteger('idsentenca1');
+            $table->bigInteger('idsentenca2');
+            $table->float('cosine_similarity');
+        });
         /*DB::statement("
         create temp table tmp as (
             select count(x.*), 
@@ -56,11 +65,13 @@ class ComentarioComentario extends Migration
               from sentenca x group by text having count(*) > 1
         );
 
-        create table sentenca_refino_1 as (
-          select * from sentenca where idsentenca not in (
+        create temp table sentencas_duplicadas as (
+          select * from sentenca where idsentenca in (
             select unnest(idsentenca) from tmp
           )
         )
+
+        update sentenca set similar_outra = true where idsentenca in (select idsentenca from sentenca_refino_1);
 
 
 
