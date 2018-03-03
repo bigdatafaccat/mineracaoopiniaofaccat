@@ -122,18 +122,18 @@ def main():
         sentences = []
         comments = []
         post_identifier = 0
-        comment_identifier = 0
 
         post_sentences = re.split('[?.!;]', message_description)
 
         for post_sentence in post_sentences:
-            # Convertemos o emoji para representação em texto
+            # Convertemos o emoji para representaÃ§Ã£o em texto
             sentence_demojized = emoji.demojize(post_sentence)
 
             sentence_words = sentence_demojized.split(' ')
             sentence_tagged = tagger.tag(sentence_words)
 
             post_identifier += 1
+            comment_identifier = 0
             sentences.append([post_identifier, post_sentence, sentence_tagged])
 
         if "comments" in post:
@@ -141,6 +141,7 @@ def main():
                 message = comment_data["message"]
 
                 comment = []
+                comments_c = []
                 comment_words = message.split(' ')
                 comment_tagged = tagger.tag(comment_words)
                 comment_sentences = re.split('[?.!;]', message)
@@ -155,12 +156,42 @@ def main():
                         comment_sentence_words)
 
                     comment_identifier += 1
+                    comment_c_identifier = 0
                     comment.append(
                         [comment_identifier, comment_sentence, comment_sentence_tagged])
 
+                if "comments" in comment_data:
+                    for comment_c_data in comment_data["comments"]["data"]:
+                        c_message = comment_c_data["message"]
+
+                        comment_c = []
+                        comment_c_words = c_message.split(' ')
+                        comment_c_tagged = tagger.tag(
+                            comment_c_words)
+                        comment_c_sentences = re.split(
+                            '[?.!;]', c_message)
+
+                        for comment_c_sentence in comment_c_sentences:
+                            comment_c_sentence_demojized = emoji.demojize(
+                                comment_c_sentence)
+
+                            comment_c_sentence_words = comment_c_sentence_demojized.split(
+                                ' ')
+                            comment_c_sentence_tagged = tagger.tag(
+                                comment_c_sentence_words)
+
+                            comment_c_identifier += 1
+                            comment_c.append(
+                                [comment_c_identifier, comment_c_sentence, comment_c_sentence_tagged])
+
+                        comments_c.append({"id": comment_c_data["id"],
+                                           "sentences": comment_c,
+                                           "tagged": comment_c_tagged})
+
                 comments.append({"id": comment_data["id"],
                                  "comment_tagged": comment_tagged,
-                                 "comment_sentences": comment})
+                                 "comment_sentences": comment,
+                                 "comments": comments_c})
 
         post_message_words = message_description.split(' ')
 
@@ -178,7 +209,7 @@ def main():
 
 
 def get_posts():
-    url = "http://localhost:3000/api/posts/pieces?startdate=2010-01-01&enddate=2013-01-01"
+    url = "http://localhost:3000/api/posts/pieces?startdate=2017-10-01&enddate=2018-01-01"
 
     return requests.get(url).json()
 
