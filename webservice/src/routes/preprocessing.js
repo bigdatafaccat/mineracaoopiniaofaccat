@@ -53,12 +53,21 @@ router.post('/fase2', (req, res) => {
 
     // Se existe algum comentário para esse post
     if (req.body.comments.length > 0) {
-
       req.body.comments.map(comment => {
-        let commentSaved = post.comments.data.find(x => x.id == comment.id)
+        let commentSaved = post.comments.data.find(x => x.id == comment.id);
 
-        commentSaved.comment_tagged = comment.comment_tagged
-        commentSaved.comment_sentences = comment.comment_sentences
+        // Comentários do comentário
+        if (commentSaved.comments) {
+          commentSaved.comments.data.map(comment_c => {
+            let commentOfComment = comment.comments.find(x => x.id === comment_c.id)
+
+            comment_c.comment_tagged = commentOfComment.tagged;
+            comment_c.comment_sentences = commentOfComment.sentences;
+          });
+        }
+
+        commentSaved.comment_tagged = comment.comment_tagged;
+        commentSaved.comment_sentences = comment.comment_sentences;
       });
     }
 
