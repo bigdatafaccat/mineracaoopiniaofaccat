@@ -58,6 +58,8 @@ class ComentarioComentario extends Migration
             $table->bigInteger('idsentenca2');
             $table->float('cosine_similarity');
         });
+
+        DB::statement("create index on sentenca (idsentenca)");
         /*DB::statement("
         create temp table tmp as (
             select count(x.*), 

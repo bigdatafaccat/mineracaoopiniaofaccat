@@ -3,7 +3,7 @@
 @section('content')
 <form name="formulario" action="{{route('anotar')}}" method="post">
     {{ csrf_field() }}
-    <input type="hidden" name="t" value="{{$sentenca->texto}}" />
+    <input type="hidden" name="t" value="{{md5($sentenca->idsentenca.'anotacao')}}" />
     <input type="hidden" name="s" value="{{$sentenca->idsentenca}}" />
     <div class="container">
         <div class="row">
