@@ -39,13 +39,28 @@ class AnotacaoController extends Controller
         var_dump(Auth::user()->id);
         //var_dump($sentenca);
 
+        //se não existir sentenca com apenas uma anotação, sorteia qualquer sentença
         if ($sentenca === null) {
+
+            $filtrosDinamico = [];
+            $filtrosDinamico[] = " and pre_aspecto_saude ";
+            $filtrosDinamico[] = " and pre_aspecto_educacao ";
+            $filtrosDinamico[] = " and pre_aspecto_seguranca ";
+            $filtrosDinamico[] = " ";
+
+            $quantidadeFiltros = count($filtrosDinamico);
+            $valorAletorio = rand(0, $quantidadeFiltros);
+            $filtroDinamicoAleatorio = $filtrosDinamico[$valorAletorio];
+
+
+
             $string = "idsentenca not in (select x.idsentenca from anotacao x where x.idusuario = ?)
                and idsentenca > ?
                and post_datahora::date >= '2017-01-01'::date
                and post_datahora::date <= '2017-07-01'::date
                and not similar_outra
-               and similaridade_analisada";
+               and similaridade_analisada
+               $filtroDinamicoAleatorio";
             $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $random])->orderBy('idsentenca')->first();
         }
         //var_dump($sentenca);

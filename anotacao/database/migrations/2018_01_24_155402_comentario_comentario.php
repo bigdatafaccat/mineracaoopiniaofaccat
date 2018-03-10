@@ -31,6 +31,9 @@ class ComentarioComentario extends Migration
             $table->text('comentario_comentario_texto')->nullable();
             $table->boolean('similar_outra');
             $table->boolean('similaridade_analisada');
+            $table->boolean('pre_aspecto_educacao');
+            $table->boolean('pre_aspecto_seguranca');
+            $table->boolean('pre_aspecto_analisado');
         });
 
         Schema::create('part_of_speech', function (Blueprint $table) {
@@ -42,6 +45,10 @@ class ComentarioComentario extends Migration
             $table->string('termo_com_stem')->nullable();
             $table->boolean('normalizacao');
             $table->boolean('termo_analisado');
+            $table->boolean('pre_aspecto_saude');
+            $table->boolean('pre_aspecto_educacao');
+            $table->boolean('pre_aspecto_seguranca');
+            $table->boolean('pre_aspecto_analisado');
             $table->timestamps();
         });
 
