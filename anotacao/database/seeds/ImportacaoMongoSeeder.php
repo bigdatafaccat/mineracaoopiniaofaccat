@@ -50,6 +50,8 @@ class ImportacaoMongoSeeder extends Seeder
                                     $partOfSpeech->idsentenca = $sentenca->idsentenca;
                                     $partOfSpeech->termo = $pos[0];
                                     $partOfSpeech->pos = $pos[1];
+                                    $partOfSpeech->termo_analisado = false;
+                                    $partOfSpeech->normalizado = false;
                                     $partOfSpeech->save();
                                     unset($partOfSpeech);
                                 }
@@ -119,6 +121,8 @@ class ImportacaoMongoSeeder extends Seeder
                                             $partOfSpeech->idsentenca = $sentenca->idsentenca;
                                             $partOfSpeech->termo = $pos[0];
                                             $partOfSpeech->pos = $pos[1];
+                                            $partOfSpeech->termo_analisado = false;
+                                            $partOfSpeech->normalizado = false;
                                             $partOfSpeech->save();
                                             unset($partOfSpeech);
                                         }
@@ -167,6 +171,8 @@ class ImportacaoMongoSeeder extends Seeder
                                                         $partOfSpeech->idsentenca = $sentenca->idsentenca;
                                                         $partOfSpeech->termo = $pos[0];
                                                         $partOfSpeech->pos = $pos[1];
+                                                        $partOfSpeech->termo_analisado = false;
+                                                        $partOfSpeech->normalizado = false;
                                                         $partOfSpeech->save();
                                                         unset($partOfSpeech);
                                                     }

@@ -1,34 +1,22 @@
+saúde
 remédio
 medicamento
 medicação
-mezinha
 infusão
 genérico
 cura
 droga
 xarope
-solução
 tisana
 xaropada
 preparado
-calda
-panaceia
-maçador
 fármaco
 mezinhice
 poção
 recurso
-jeito
 expediente
 bebida
 grito
-aguardente
-cozimento
-corretivo
-decocto
-cozer
-tópico
-bombril
 hemifumarato
 manguala
 medicamentos
@@ -50,19 +38,9 @@ rabino
 físico
 médico-cirurgião
 consultório
-arbitrário
 uróscopo
-professor
-amigo
 medicinal
-travesso
-avicena
 proctologista
-rabugento
-averroes
-buliçoso
-ajudador
-hannemann
 próstata
 protomédico
 arquíatro
@@ -72,15 +50,12 @@ iatralipta
 vermífugo
 vermicida
 lombrigueiro
-paliativo
 contraveneno
 antídoto
 anti-helmíntico
 emético
-específico
 remédio
 placebo
-recurso
 socorro
 estimulante
 cordial
@@ -99,7 +74,6 @@ antisséptico
 alterativo
 unguento
 tônico
-alterante
 antitóxico
 linimento
 febrífugo
@@ -108,15 +82,12 @@ antelmíntico
 lombrigueiras
 mitrídates
 nepente
-panacéia
 socorro
 ajuda
 calmante
 tônico
 analéptico
 sedativo
-auxílio
-assistência
 lenitivo
 leniente
 anódino
@@ -127,7 +98,6 @@ reparo
 profilaxia
 analgésico
 corretivo
-demão
 antisséptico
 sedante
 adjutório
@@ -174,9 +144,7 @@ catolicão
 ceromel
 diaquilão
 diascórdio
-elixir de longa vida
-elixir vitæ
-pedra filosofal
+elixir
 farmácia
 botica
 loja
@@ -201,13 +169,7 @@ curandeiro
 benzedor
 rezador
 curador
-charlatão
-benzilhão
-pajé
-feiticeiro
-pai-de-santo
 milagreiro
-macumbeiro
 médico
 abençoadeiro
 benzedeiro
@@ -218,8 +180,6 @@ saludador
 pílula
 comprimido
 pastilha
-tablóide
-símplices
 genérico
 dose
 similar
@@ -231,11 +191,10 @@ tablete
 beberagem
 drágea
 tisana
-lambedor
 mezinha
 cápsula
 eletuário
-medicamento caseiro
+medicamento
 poção
 pungarecos
 puçanga
@@ -279,7 +238,6 @@ iatrologia
 iatroquímica
 iátrica
 odontotecnia
-charlatão
 endireita
 mezinheiro
 mediqueiro
@@ -293,7 +251,12 @@ simplicista
 amezinhador
 carimbamba
 charlata
-doutor da mula ruça
+doutor
 jalapeiro
 medicastro
 saludador
+leito
+hospital
+posto
+curativo
+injeção

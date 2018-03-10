@@ -38,6 +38,10 @@ class ComentarioComentario extends Migration
             $table->bigInteger('idsentenca');
             $table->text('termo');
             $table->string('pos');
+            $table->string('termo_sem_acentuacao')->nullable();
+            $table->string('termo_com_stem')->nullable();
+            $table->boolean('normalizacao');
+            $table->boolean('termo_analisado');
             $table->timestamps();
         });
 
