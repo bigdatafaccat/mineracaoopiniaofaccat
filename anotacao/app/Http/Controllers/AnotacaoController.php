@@ -35,10 +35,10 @@ class AnotacaoController extends Controller
                and post_datahora::date >= '2017-01-01'::date
                and post_datahora::date <= '2017-07-01'::date
                and not similar_outra
-               and length(post_texto) > 2
+               and tamanho_post_texto > 2
                and post_dia = ? 
                and similaridade_analisada";
-        $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $diaAleatorio])->orderBy('idsentenca')->first();
+        $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $diaAleatorio])->first();
         //var_dump($sentenca);
 
         //se não existir sentenca com apenas uma anotação, sorteia qualquer sentença
@@ -61,10 +61,10 @@ class AnotacaoController extends Controller
                and post_datahora::date <= '2017-07-01'::date
                and not similar_outra
                and similaridade_analisada
-               and length(post_texto) > 2
+               and tamanho_post_texto > 2
                and post_dia = ?
                $filtroDinamicoAleatorio";
-            $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $diaAleatorio])->orderBy('idsentenca')->first();
+            $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $diaAleatorio])->first();
         }
         //var_dump($sentenca);
         //die('aqui');

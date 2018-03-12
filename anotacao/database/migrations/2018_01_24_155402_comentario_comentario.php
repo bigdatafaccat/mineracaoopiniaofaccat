@@ -35,6 +35,11 @@ class ComentarioComentario extends Migration
             $table->boolean('pre_aspecto_seguranca');
             $table->boolean('pre_aspecto_analisado');
             $table->integer('post_dia')->nullable();
+            $table->integer('tamanho_sentenca_texto')->nullable();
+            $table->integer('tamanho_comentario_texto')->nullable();
+            $table->integer('tamanho_post_texto')->nullable();
+            $table->integer('tamanho_comentario_comentario_texto')->nullable();
+
         });
 
         Schema::create('part_of_speech', function (Blueprint $table) {
@@ -71,15 +76,11 @@ class ComentarioComentario extends Migration
             $table->float('cosine_similarity');
         });
 
-        DB::statement("create index on sentenca (idsentenca)");
-        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_educacao");
-        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_saude");
-        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_educacao");
-        DB::statement("create index on sentenca (idsentenca, post_dia) where not similar_outra");
-
-        DB::statement("create index on sentenca (idsentenca) where post_datahora::date >= '2017-01-01'::date and post_datahora::date <= '2017-07-01'::date and not similar_outra and similaridade_analisada and pre_aspecto_saude");
-        DB::statement("create index on sentenca (idsentenca) where post_datahora::date >= '2017-01-01'::date and post_datahora::date <= '2017-07-01'::date and not similar_outra and similaridade_analisada and pre_aspecto_educacao");
-        DB::statement("create index on sentenca (idsentenca) where post_datahora::date >= '2017-01-01'::date and post_datahora::date <= '2017-07-01'::date and not similar_outra and similaridade_analisada and pre_aspecto_seguranca");
+        DB::statement("create index on sentenca (idsentenca, post_dia)");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_educacao and not similar_outra and similaridade_analisada");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_saude and not similar_outra and similaridade_analisada");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_educacao and not similar_outra and similaridade_analisada");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where not similar_outra and not similar_outra and similaridade_analisada");
 
 
         DB::statement("create index on part_of_speech (idpart_of_speech) where normalizado");

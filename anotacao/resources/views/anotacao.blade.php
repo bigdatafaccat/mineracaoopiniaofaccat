@@ -6,10 +6,17 @@
     <input type="hidden" name="t" value="{{md5($sentenca->idsentenca.'anotacao')}}" />
     <input type="hidden" name="s" value="{{$sentenca->idsentenca}}" />
     <div class="container">
+
+        <div class="row">
+            <div class="col-md-9 col-md-offset-2">
+                <h1 class="text-center">Avaliação de opiniões</h1>
+                <h1>Parte 1</h1>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-9 col-md-offset-2">
                 <div class="">
-                    <h1 class="text-center">Avaliação de opiniões</h1>
 
                     @if($sentenca->tipo_texto == 'post')
                         <div class="lead">Leia o seguinte texto:</div>
@@ -70,6 +77,7 @@
             </div>
         </div>
 
+        <hr />
 
         <div class="row lead">
             <div class="col-md-7 col-md-offset-2">
@@ -120,21 +128,28 @@
                 </label>
             </div>
         </div>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-9 col-md-offset-2">
-                    <hr />
-                    <div class="lead">
-                        Agora leia o seguinte trecho e depois responda as perguntas abaixo:
-                    </div>
 
+        <br />
+        <br />
+        <hr />
 
-                    <hr />
-                    <h1 class="well">
-                        {{$sentenca->texto}}
-                    </h1>
-                    <hr />
+        <div class="row">
+            <div class="col-md-9 col-md-offset-2">
+                <h1>Parte 2</h1>
+            </div>
+        </div>
+
+        <div class="row lead">
+            <div class="col-md-9 col-md-offset-2">
+                <div class="lead">
+                    Agora leia o seguinte trecho e depois responda as perguntas abaixo:
                 </div>
+
+
+                <hr />
+                <h1 class="well">
+                    {{$sentenca->texto}}
+                </h1>
             </div>
         </div>
 
