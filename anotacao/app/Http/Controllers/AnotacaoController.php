@@ -28,15 +28,17 @@ class AnotacaoController extends Controller
 
         */
 
+        $diaAleatorio = rand(1, 31);
         //primeiro verifica se existe alguma sentenca com apenas uma anotacao
         $string = "idsentenca in (select x.idsentenca from anotacao x group by x.idsentenca having count(*) = 1)
                and idsentenca not in (select x.idsentenca from anotacao x where x.idusuario = ?)
                and post_datahora::date >= '2017-01-01'::date
                and post_datahora::date <= '2017-07-01'::date
                and not similar_outra
+               and length(post_texto) > 2
+               and post_dia = ? 
                and similaridade_analisada";
-        $sentenca = Sentenca::whereRaw($string, [Auth::user()->id])->orderBy('idsentenca')->first();
-        var_dump(Auth::user()->id);
+        $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $diaAleatorio])->orderBy('idsentenca')->first();
         //var_dump($sentenca);
 
         //se não existir sentenca com apenas uma anotação, sorteia qualquer sentença
@@ -49,19 +51,20 @@ class AnotacaoController extends Controller
             $filtrosDinamico[] = " ";
 
             $quantidadeFiltros = count($filtrosDinamico);
-            $valorAletorio = rand(0, $quantidadeFiltros);
+            $valorAletorio = rand(0, ($quantidadeFiltros-1));
             $filtroDinamicoAleatorio = $filtrosDinamico[$valorAletorio];
 
 
 
             $string = "idsentenca not in (select x.idsentenca from anotacao x where x.idusuario = ?)
-               and idsentenca > ?
                and post_datahora::date >= '2017-01-01'::date
                and post_datahora::date <= '2017-07-01'::date
                and not similar_outra
                and similaridade_analisada
+               and length(post_texto) > 2
+               and post_dia = ?
                $filtroDinamicoAleatorio";
-            $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $random])->orderBy('idsentenca')->first();
+            $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $diaAleatorio])->orderBy('idsentenca')->first();
         }
         //var_dump($sentenca);
         //die('aqui');
@@ -104,6 +107,8 @@ class AnotacaoController extends Controller
             $anotacao->sentimento_nenhum        = Input::get('sentimento_nenhum');
             $anotacao->sentimento_naosei        = Input::get('sentimento_naosei');
             $anotacao->sentimento_outro         = Input::get('sentimento_outro');
+            $anotacao->vale_paranhana           = Input::get('vale_paranhana');
+
             if (Input::get('botao') === 'pular') {
                 $anotacao->pular = true;
             }

@@ -52,6 +52,8 @@ class Anotacao extends Migration
             $table->boolean('sentimento_naosei')->nullable();
             $table->string('sentimento_outro')->nullable();
 
+            $table->boolean('vale_paranhana')->nullable();
+
             $table->timestamps();
         });
 

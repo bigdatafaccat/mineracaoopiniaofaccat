@@ -34,6 +34,7 @@ class ComentarioComentario extends Migration
             $table->boolean('pre_aspecto_educacao');
             $table->boolean('pre_aspecto_seguranca');
             $table->boolean('pre_aspecto_analisado');
+            $table->integer('post_dia')->nullable();
         });
 
         Schema::create('part_of_speech', function (Blueprint $table) {
@@ -71,6 +72,20 @@ class ComentarioComentario extends Migration
         });
 
         DB::statement("create index on sentenca (idsentenca)");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_educacao");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_saude");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_educacao");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where not similar_outra");
+
+        DB::statement("create index on sentenca (idsentenca) where post_datahora::date >= '2017-01-01'::date and post_datahora::date <= '2017-07-01'::date and not similar_outra and similaridade_analisada and pre_aspecto_saude");
+        DB::statement("create index on sentenca (idsentenca) where post_datahora::date >= '2017-01-01'::date and post_datahora::date <= '2017-07-01'::date and not similar_outra and similaridade_analisada and pre_aspecto_educacao");
+        DB::statement("create index on sentenca (idsentenca) where post_datahora::date >= '2017-01-01'::date and post_datahora::date <= '2017-07-01'::date and not similar_outra and similaridade_analisada and pre_aspecto_seguranca");
+
+
+        DB::statement("create index on part_of_speech (idpart_of_speech) where normalizado");
+        DB::statement("create index on part_of_speech (idsentenca) where normalizado");
+
+
         /*DB::statement("
         create temp table tmp as (
             select count(x.*), 
