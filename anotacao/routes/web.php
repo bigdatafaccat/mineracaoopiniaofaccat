@@ -11,20 +11,22 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
 
+Route::get('login', 'Auth\LoginController@redirectToProvider');
 Route::get('login/google', 'Auth\LoginController@redirectToProvider');
 Route::get('login/google/callback', 'Auth\LoginController@handleProviderCallback');
+//Auth::routes();
+Route::get('login', 'Auth\LoginController@redirectToProvider')->name('login');
+Route::post('logout', 'Auth\LoginController@App\Http\Controllers\Auth\LoginController@logout')->name('logout');
 
-Auth::routes();
+
 //Route::get('login', 'Auth\LoginController@redirectToProvider');
 
 //Route::get('/home', 'HomeController@index')->name('home');
 
 
+Route::get('/', 'AnotacaoController@exibirSentenca')->name('anotacao')->middleware('auth');
 Route::get('/home', 'AnotacaoController@exibirSentenca')->name('anotacao')->middleware('auth');
 Route::get('/anotacao', 'AnotacaoController@exibirSentenca')->name('anotacao')->middleware('auth');
 Route::post('/anotar', 'AnotacaoController@registrarAnotacao')->name('anotar')->middleware('auth');
