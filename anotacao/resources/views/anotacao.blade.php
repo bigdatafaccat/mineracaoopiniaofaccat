@@ -8,14 +8,14 @@
     <div class="container">
 
         <div class="row">
-            <div class="col-md-9 col-md-offset-2">
+            <div class="col-md-10 col-md-offset-1">
                 <h1 class="text-center">Avaliação de opiniões</h1>
                 <h1>Parte 1</h1>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-md-9 col-md-offset-2">
+            <div class="col-md-10 col-md-offset-1">
                 <div class="">
 
                     @if($sentenca->tipo_texto == 'post')
@@ -56,7 +56,7 @@
 
 
         <div class="row lead">
-            <div class="col-md-7 col-md-offset-2">
+            <div class="col-md-9 col-md-offset-1">
                 @if($sentenca->tipo_texto == 'post')
                     O texto acima fala sobre algum assunto que possa estar relacionado aos municípios do Vale do Paranhana (Taquara, Igrejinha, Parobé, Três Coroas, etc...)?
                 @else
@@ -65,7 +65,7 @@
             </div>
         </div>
         <div class="row lead">
-            <div class="col-md-2 col-md-offset-2">
+            <div class="col-md-2 col-md-offset-1">
                 <label class="radio-inline">
                     <input type="radio" name="vale_paranhana" value="t"> Sim
                 </label>
@@ -80,12 +80,12 @@
         <hr />
 
         <div class="row lead">
-            <div class="col-md-7 col-md-offset-2">
+            <div class="col-md-7 col-md-offset-1">
                 Quais são os assuntos mencionados:
             </div>
         </div>
         <div class="row lead">
-            <div class="col-md-2 col-md-offset-2">
+            <div class="col-md-2 col-md-offset-1">
                 <label class="checkbox-inline">
                     <input type="checkbox" name="assunto_saude" value="t"> Saúde
                 </label>
@@ -112,9 +112,14 @@
             </div>
         </div>
         <div class="row lead">
-            <div class="col-md-2  col-md-offset-2">
+            <div class="col-md-2  col-md-offset-1">
                 <label class="checkbox-inline">
                     <input type="checkbox" name="assunto_politica" value="t"> Política
+                </label>
+            </div>
+            <div class="col-md-2">
+                <label class="checkbox-inline">
+                    <input type="checkbox" name="assunto_transito" value="t"> Trânsito
                 </label>
             </div>
             <div class="col-md-2">
@@ -134,13 +139,13 @@
         <hr />
 
         <div class="row">
-            <div class="col-md-9 col-md-offset-2">
+            <div class="col-md-10 col-md-offset-1">
                 <h1>Parte 2</h1>
             </div>
         </div>
 
         <div class="row lead">
-            <div class="col-md-9 col-md-offset-2">
+            <div class="col-md-10 col-md-offset-1">
                 <div class="lead">
                     Agora leia o seguinte trecho e depois responda as perguntas abaixo:
                 </div>
@@ -154,34 +159,34 @@
         </div>
 
         <div class="row lead">
-            <div class="col-md-4 col-md-offset-2">
+            <div class="col-md-4 col-md-offset-1">
                 Esse texto apresenta opinião:
             </div>
         </div>
         <div class="row lead">
-            <div class="col-md-2  col-md-offset-2">
-                    <label class="radio-inline">
-                        <input type="radio" name="opiniao" value="positiva">
-                        Positiva
-                    </label>
+            <div class="col-md-3  col-md-offset-1">
+                <label class="radio-inline">
+                    <input type="radio" name="opiniao" value="positiva">
+                    Algo de bom ou positivo é apresentado no texto
+                </label>
+            </div>
+            <div class="col-md-4">
+                <label class="radio-inline">
+                    <input type="radio" name="opiniao" value="negativa">
+                    Algo de ruim ou negativo é apresentado no texto
+                </label>
             </div>
             <div class="col-md-2">
-                    <label class="radio-inline">
-                        <input type="radio" name="opiniao" value="negativa">
-                        Negativa
-                    </label>
+                <label class="radio-inline">
+                    <input type="radio" name="opiniao" value="nenhuma">
+                    Não há
+                </label>
             </div>
             <div class="col-md-2">
-                    <label class="radio-inline">
-                        <input type="radio" name="opiniao" value="nenhuma">
-                        Não há
-                    </label>
-            </div>
-            <div class="col-md-2">
-                    <label class="radio-inline">
-                        <input type="radio" name="opiniao" value="naosei">
-                        Não sei
-                    </label>
+                <label class="radio-inline">
+                    <input type="radio" name="opiniao" value="naosei">
+                    Não sei
+                </label>
             </div>
         </div>
 
@@ -189,12 +194,12 @@
         <hr />
 
         <div class="row lead">
-            <div class="col-md-6 col-md-offset-2">
+            <div class="col-md-6 col-md-offset-1">
                 Quais emoções/sentimentos você observa nesse texto:
             </div>
         </div>
         <div class="row lead">
-            <div class="col-md-2 col-md-offset-2">
+            <div class="col-md-2 col-md-offset-1">
                 <label class="checkbox-inline">
                     <input type="checkbox" name="sentimento_alegria" value="t"> Alegria
                 </label>
@@ -221,7 +226,7 @@
             </div>
         </div>
         <div class="row lead">
-            <div class="col-md-2 col-md-offset-2">
+            <div class="col-md-2 col-md-offset-1">
                 <label class="checkbox-inline">
                     <input type="checkbox" name="sentimento_repugnancia" value="t"> Repugnância
                 </label>

@@ -93,6 +93,7 @@ class AnotacaoController extends Controller
             $anotacao->assunto_meioambiente     = Input::get('assunto_meioambiente');
             $anotacao->assunto_emprego          = Input::get('assunto_emprego');
             $anotacao->assunto_politica         = Input::get('assunto_politica');
+            $anotacao->assunto_transito         = Input::get('assunto_transito');
             $anotacao->assunto_naosei           = Input::get('assunto_naosei');
             $anotacao->assunto_nenhum           = Input::get('assunto_nenhum');
             $anotacao->assunto_outro            = Input::get('assunto_outro');
