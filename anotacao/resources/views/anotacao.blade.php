@@ -131,6 +131,11 @@
             </div>
             <div class="col-md-2">
                 <label class="checkbox-inline">
+                    <input type="checkbox" name="assunto_economia" value="t"> Economia
+                </label>
+            </div>
+            <div class="col-md-2">
+                <label class="checkbox-inline">
                     <input type="checkbox" name="assunto_nenhum" value="t"> Nenhum
                 </label>
             </div>
