@@ -122,4 +122,8 @@ class AnotacaoController extends Controller
         //die('aqui');
         return redirect(route('anotacao'));
     }
+
+    public function orientacao() {
+        return view('orientacao ');
+    }
 }

@@ -30,3 +30,5 @@ Route::get('/', 'AnotacaoController@exibirSentenca')->name('anotacao')->middlewa
 Route::get('/home', 'AnotacaoController@exibirSentenca')->name('anotacao')->middleware('auth');
 Route::get('/anotacao', 'AnotacaoController@exibirSentenca')->name('anotacao')->middleware('auth');
 Route::post('/anotar', 'AnotacaoController@registrarAnotacao')->name('anotar')->middleware('auth');
+
+Route::get('/orientacao', 'AnotacaoController@orientacao')->name('orientacao')->middleware('auth');

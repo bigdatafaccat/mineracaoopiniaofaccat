@@ -7,9 +7,16 @@
     <input type="hidden" name="s" value="{{$sentenca->idsentenca}}" />
     <div class="container">
 
+
         <div class="row">
             <div class="col-md-10 col-md-offset-1">
                 <h1 class="text-center">Avaliação de opiniões</h1>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
                 <h1>Parte 1</h1>
             </div>
         </div>
@@ -167,19 +174,19 @@
             <div class="col-md-3  col-md-offset-1">
                 <label class="radio-inline">
                     <input type="radio" name="opiniao" value="positiva">
-                    Algo de bom ou positivo é apresentado no texto
+                    Boa ou positiva
                 </label>
             </div>
             <div class="col-md-4">
                 <label class="radio-inline">
                     <input type="radio" name="opiniao" value="negativa">
-                    Algo de ruim ou negativo é apresentado no texto
+                    Ruim ou negativa
                 </label>
             </div>
             <div class="col-md-2">
                 <label class="radio-inline">
                     <input type="radio" name="opiniao" value="nenhuma">
-                    Não há
+                    Não há opinião
                 </label>
             </div>
             <div class="col-md-2">
@@ -255,10 +262,16 @@
 
         <hr />
 
-        <div>
-            <button class="btn btn-primary btn-lg" type="submit" name="botao" value="ok">Enviar resposta</button>
-            <button class="btn btn-default pull-right" type="submit" name="botao" value="pular">Pular pergunta</button>
-            <button class="btn btn-default pull-right" type="submit" name="botao" value="cancelar">Cancelar</button>
+        <div class="row">
+            <div class="col-md-offset-3 col-md-2">
+                <button class="btn btn-primary btn-lg" type="submit" name="botao" value="ok">Enviar resposta</button>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-default pull-right" type="submit" name="botao" value="pular">Pular pergunta</button>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-default pull-right" type="submit" name="botao" value="cancelar">Cancelar</button>
+            </div>
         </div>
     </div>
     <hr />
