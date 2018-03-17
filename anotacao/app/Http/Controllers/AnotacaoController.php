@@ -58,7 +58,8 @@ class AnotacaoController extends Controller
 
 
 
-            $string = "idsentenca not in (select x.idsentenca from anotacao x where x.idusuario = ?)
+            $string = "idsentenca not in (select x.idsentenca from anotacao x group by x.idsentenca having count(*) >= 2)
+               and idsentenca not in (select x.idsentenca from anotacao x where x.idusuario = ?)
                and post_datahora::date >= '2017-01-01'::date
                and post_datahora::date <= '2017-07-01'::date
                and not similar_outra
