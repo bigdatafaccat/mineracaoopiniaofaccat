@@ -87,7 +87,7 @@
         <hr />
 
         <div class="row lead">
-            <div class="col-md-7 col-md-offset-1">
+            <div class="col-md-9 col-md-offset-1">
                 Quais são os assuntos mencionados (escolher uma ou mais opções):
             </div>
         </div>
@@ -166,7 +166,7 @@
         </div>
 
         <div class="row lead">
-            <div class="col-md-4 col-md-offset-1">
+            <div class="col-md-9 col-md-offset-1">
                 Esse texto apresenta opinião (escolher apenas uma opção):
             </div>
         </div>
@@ -183,7 +183,7 @@
                     Ruim ou negativa
                 </label>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <label class="radio-inline">
                     <input type="radio" name="opiniao" value="nenhuma">
                     Não há opinião
@@ -201,7 +201,7 @@
         <hr />
 
         <div class="row lead">
-            <div class="col-md-6 col-md-offset-1">
+            <div class="col-md-9 col-md-offset-1">
                 Quais emoções/sentimentos você observa nesse texto (escolher uma ou mais opções):
             </div>
         </div>
