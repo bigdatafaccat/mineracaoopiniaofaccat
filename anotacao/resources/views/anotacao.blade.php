@@ -177,7 +177,7 @@
                     Boa ou positiva
                 </label>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="radio-inline">
                     <input type="radio" name="opiniao" value="negativa">
                     Ruim ou negativa
