@@ -50,7 +50,7 @@ class AnotacaoController extends Controller
             $filtrosDinamico[] = " and pre_aspecto_saude ";
             $filtrosDinamico[] = " and pre_aspecto_educacao ";
             $filtrosDinamico[] = " and pre_aspecto_seguranca ";
-            $filtrosDinamico[] = " ";
+            //$filtrosDinamico[] = " ";
 
             $quantidadeFiltros = count($filtrosDinamico);
             $valorAletorio = rand(0, ($quantidadeFiltros-1));
