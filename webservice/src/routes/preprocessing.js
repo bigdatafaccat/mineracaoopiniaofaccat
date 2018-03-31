@@ -51,12 +51,12 @@ router.post('/fase2', (req, res) => {
 
     let post = postSaved.toObject()
 
-    // Se existe algum comentário para esse post
+    // Se existe algum coment?rio para esse post
     if (req.body.comments.length > 0) {
       req.body.comments.map(comment => {
         let commentSaved = post.comments.data.find(x => x.id == comment.id);
 
-        // Comentários do comentário
+        // Coment?rios do coment?rio
         if (commentSaved.comments) {
           commentSaved.comments.data.map(comment_c => {
             let commentOfComment = comment.comments.find(x => x.id === comment_c.id)
@@ -70,6 +70,28 @@ router.post('/fase2', (req, res) => {
         commentSaved.comment_sentences = comment.comment_sentences;
       });
     }
+
+    PostModel.update({ post_id: postId }, post, function (err) {
+      if (err) {
+        return res.sendStatus(500).send(err.message);
+      } else {
+        return res.sendStatus(200);
+      }
+    });
+  });
+});
+
+router.post('/fix', (req, res) => {
+  const postId = req.body.post_id
+
+  PostModel.findOne({ post_id: postId }, (err, postSaved) => {
+    let post = postSaved.toObject()
+
+    post.comments.data.map(x => {
+      if (x.id == req.body.comment_id) {
+        x.reactions = req.body.reactions;
+      }
+    });
 
     PostModel.update({ post_id: postId }, post, function (err) {
       if (err) {

@@ -19,7 +19,8 @@ def create_url_post(post_id, config):
     text += "status_type,comments.fields(comment_count,from,id,like_count,"
     text += "permalink_url,created_time,message,comments.fields(comment_count,"
     text += "from,id,like_count,created_time,message,"
-    text += "reactions.fields(id,name,type,username,profile_type))),"
+    text += "reactions.fields(id,name,type,username,profile_type)),"
+    text += "reactions.fields(id,name,type,username,profile_type)),"
     text += "reactions.fields(id,name,type,username,profile_type), sharedposts"
     text += "&access_token=" + config["access_token"]
 

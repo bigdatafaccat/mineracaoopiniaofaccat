@@ -35,6 +35,16 @@ router.get('/', (req, res) => {
   });
 });
 
+router.get('/unique/:id', (req, res) => {
+  const postId = req.params.id
+
+  PostModel.findOne({ post_id: postId }, (err, postSaved) => {
+    const post = postSaved.toObject()
+
+    return res.send({ data: post });
+  });
+});
+
 router.get('/pieces', (req, res) => {
   let filter = {};
 
