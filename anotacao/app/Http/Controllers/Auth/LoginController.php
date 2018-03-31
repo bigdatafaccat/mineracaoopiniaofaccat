@@ -29,6 +29,7 @@ class LoginController extends Controller
      * @var string
      */
     protected $redirectTo = '/home';
+    protected $loginPath = '/login/google';
 
     /**
      * Create a new controller instance.
@@ -66,7 +67,7 @@ class LoginController extends Controller
             Auth::login($user);
         }
 
-        return redirect('home');
+        return redirect('orientacao');
 
     }
 }

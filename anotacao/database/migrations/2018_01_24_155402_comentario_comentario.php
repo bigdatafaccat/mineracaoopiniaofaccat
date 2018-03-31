@@ -31,6 +31,15 @@ class ComentarioComentario extends Migration
             $table->text('comentario_comentario_texto')->nullable();
             $table->boolean('similar_outra');
             $table->boolean('similaridade_analisada');
+            $table->boolean('pre_aspecto_educacao');
+            $table->boolean('pre_aspecto_seguranca');
+            $table->boolean('pre_aspecto_analisado');
+            $table->integer('post_dia')->nullable();
+            $table->integer('tamanho_sentenca_texto')->nullable();
+            $table->integer('tamanho_comentario_texto')->nullable();
+            $table->integer('tamanho_post_texto')->nullable();
+            $table->integer('tamanho_comentario_comentario_texto')->nullable();
+
         });
 
         Schema::create('part_of_speech', function (Blueprint $table) {
@@ -38,6 +47,14 @@ class ComentarioComentario extends Migration
             $table->bigInteger('idsentenca');
             $table->text('termo');
             $table->string('pos');
+            $table->string('termo_sem_acentuacao')->nullable();
+            $table->string('termo_com_stem')->nullable();
+            $table->boolean('normalizacao');
+            $table->boolean('termo_analisado');
+            $table->boolean('pre_aspecto_saude');
+            $table->boolean('pre_aspecto_educacao');
+            $table->boolean('pre_aspecto_seguranca');
+            $table->boolean('pre_aspecto_analisado');
             $table->timestamps();
         });
 
@@ -58,6 +75,18 @@ class ComentarioComentario extends Migration
             $table->bigInteger('idsentenca2');
             $table->float('cosine_similarity');
         });
+
+        DB::statement("create index on sentenca (idsentenca, post_dia)");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_educacao and not similar_outra and similaridade_analisada");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_saude and not similar_outra and similaridade_analisada");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where pre_aspecto_educacao and not similar_outra and similaridade_analisada");
+        DB::statement("create index on sentenca (idsentenca, post_dia) where not similar_outra and not similar_outra and similaridade_analisada");
+
+
+        DB::statement("create index on part_of_speech (idpart_of_speech) where normalizado");
+        DB::statement("create index on part_of_speech (idsentenca) where normalizado");
+
+
         /*DB::statement("
         create temp table tmp as (
             select count(x.*), 

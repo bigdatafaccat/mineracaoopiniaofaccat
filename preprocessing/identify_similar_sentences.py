@@ -13,19 +13,19 @@ cur = conn.cursor()
 print("Início do script")
 print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
-#cur.execute("create temp table tmp as (select count(x.*), array_agg(x.idsentenca) as idsentenca from sentenca x group by texto having count(*) > 1)")
-print("Criada tabela temporária tmp")
-print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+#cur.execute("create temp table tmp as (select count(x.*), array_agg(x.idsentenca) as idsentenca from sentenca x where not x.similaridade_analisada group by texto having count(*) > 1)")
+#print("Criada tabela temporária tmp")
+#print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
-#cur.execute("create temp table sentencas_duplicadas as (select * from sentenca where idsentenca in (select unnest(idsentenca) from tmp))")
-print("Criada tabela temporária sentencas_duplicadas")
-print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+#cur.execute("create temp table sentencas_duplicadas as (select * from sentenca where not similaridade_analisada and idsentenca in (select unnest(idsentenca) from tmp))")
+#print("Criada tabela temporária sentencas_duplicadas")
+#print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
-#cur.execute("update sentenca set similar_outra = true where similar_outra = false and idsentenca in (select idsentenca from sentencas_duplicadas)")
-print("Sentenças duplicadas identificadas")
-print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+#cur.execute("update sentenca set similar_outra = true, similaridade_analisada = true where similar_outra = false and similaridade_analisada = false and idsentenca in (select idsentenca from sentencas_duplicadas)")
+#print("Sentenças duplicadas identificadas")
+#print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
-cur.execute("SELECT idsentenca,texto FROM sentenca where not similar_outra and not similaridade_analisada and post_datahora::date > '2017-01-01' and post_datahora::date <= '2017-12-31' order by texto limit 10000")
+cur.execute("SELECT idsentenca,texto FROM sentenca where not similar_outra and not similaridade_analisada and post_datahora::date > '2017-01-01' and post_datahora::date <= '2017-12-31' order by texto limit 2500")
 
 result = cur.fetchall()
 conn.commit()
@@ -49,6 +49,7 @@ print("fim similaridades")
 cur = conn.cursor()
 indice_1 = 0
 for i in documents:
+    #codigo obtido em http://blog.christianperone.com/2013/09/machine-learning-cosine-similarity-for-vector-space-models-part-iii/
     tfidf_vectorizer = TfidfVectorizer()
     tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
     #print(tfidf_matrix.shape)

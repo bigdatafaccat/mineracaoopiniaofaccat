@@ -52,6 +52,18 @@ class Anotacao extends Migration
             $table->boolean('sentimento_naosei')->nullable();
             $table->string('sentimento_outro')->nullable();
 
+            $table->boolean('vale_paranhana')->nullable();
+
+            $table->timestamps();
+        });
+
+        Schema::create('termo', function (Blueprint $table) {
+            $table->bigIncrements('idtermo');
+            $table->string('termo');
+            $table->string('termo_sem_acentuacao');
+            $table->string('aspecto');
+            $table->string('termo_stemming')->nullable();
+            $table->string('termo_lemmatization')->nullable();
             $table->timestamps();
         });
     }

@@ -13,38 +13,78 @@ class AnotacaoController extends Controller
 {
     public function exibirSentenca() {
 
-        $min = Sentenca::min('idsentenca');
-        $max = Sentenca::max('idsentenca');
-        $random = rand($min, $max);
+        //$min = Sentenca::min('idsentenca');
+        //$max = Sentenca::max('idsentenca');
+        //$random = rand($min, $max);
 
-        $teste = DB::connection('mongodb')->collection('posts')->take(1)->get();
-        var_dump($teste);
 
         /*Regras para apresentar anotação de sentenças
-
         1 - Pessoas anotarão sentenças
         2 - Cada sentença será anotada por no mínimo 2 pessoas
         3 - Enquanto duas pessoas não concordarem com a anotação da sentença, ela será candidata a nova anotação
-
-
         */
 
-        $string = "idsentenca not in (select x.idsentenca from anotacao x where x.idusuario = ?)
-               and idsentenca > ?
+        $diaAleatorio = rand(1, 31);
+        $verificarSeJaExiste = rand(0,1);
+
+
+        $sentenca = null;
+        if ($verificarSeJaExiste === 1) {
+            //primeiro verifica se existe alguma sentenca com apenas uma anotacao
+            $string = "idsentenca in (select x.idsentenca from anotacao x group by x.idsentenca having count(*) = 1)
+                   and idsentenca not in (select x.idsentenca from anotacao x where x.idusuario = ?)
+                   and post_datahora::date >= '2017-01-01'::date
+                   and post_datahora::date <= '2017-07-01'::date
+                   and not similar_outra
+                   and tamanho_post_texto > 2
+                   and post_dia = ? 
+                   and similaridade_analisada";
+            $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $diaAleatorio])->first();
+        }
+        //var_dump($sentenca);
+
+        //se não existir sentenca com apenas uma anotação, sorteia qualquer sentença
+        if ($sentenca === null) {
+
+            $filtrosDinamico = [];
+            $filtrosDinamico[] = " and pre_aspecto_saude ";
+            $filtrosDinamico[] = " and pre_aspecto_educacao ";
+            $filtrosDinamico[] = " and pre_aspecto_seguranca ";
+            //$filtrosDinamico[] = " ";
+
+            $quantidadeFiltros = count($filtrosDinamico);
+            $valorAletorio = rand(0, ($quantidadeFiltros-1));
+            $filtroDinamicoAleatorio = $filtrosDinamico[$valorAletorio];
+
+
+
+            $string = "idsentenca not in (select x.idsentenca from anotacao x group by x.idsentenca having count(*) >= 2)
+               and idsentenca not in (select x.idsentenca from anotacao x where x.idusuario = ?)
                and post_datahora::date >= '2017-01-01'::date
-               and post_datahora::date <= '2017-07-01'::date";
-        $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $random])->first();
+               and post_datahora::date <= '2017-07-01'::date
+               and not similar_outra
+               and similaridade_analisada
+               and tamanho_post_texto > 2
+               and post_dia = ?
+               $filtroDinamicoAleatorio";
+            $sentenca = Sentenca::whereRaw($string, [Auth::user()->id, $diaAleatorio])->first();
+        }
+        //var_dump($sentenca);
+        //die('aqui');
+
         return view('anotacao', ['sentenca' => $sentenca]);
     }
 
     public function registrarAnotacao() {
 
+
         $idsentenca = Input::get('s');
         $texto = Input::get('t');
 
-        $condicao = "idsentenca = ? and trim(texto) = ?";
+        $condicao = "idsentenca = ? and md5(idsentenca::text || 'anotacao') = ?";
         $sentenca = Sentenca::whereRaw($condicao, [$idsentenca, trim($texto)])->first();
 
+        //var_dump($idsentenca, $texto, strlen($texto));
         if ($sentenca) {
             $anotacao = new Anotacao();
             $anotacao->idsentenca               = $sentenca->idsentenca;
@@ -56,6 +96,8 @@ class AnotacaoController extends Controller
             $anotacao->assunto_meioambiente     = Input::get('assunto_meioambiente');
             $anotacao->assunto_emprego          = Input::get('assunto_emprego');
             $anotacao->assunto_politica         = Input::get('assunto_politica');
+            $anotacao->assunto_transito         = Input::get('assunto_transito');
+            $anotacao->assunto_economia         = Input::get('assunto_economia');
             $anotacao->assunto_naosei           = Input::get('assunto_naosei');
             $anotacao->assunto_nenhum           = Input::get('assunto_nenhum');
             $anotacao->assunto_outro            = Input::get('assunto_outro');
@@ -70,14 +112,22 @@ class AnotacaoController extends Controller
             $anotacao->sentimento_nenhum        = Input::get('sentimento_nenhum');
             $anotacao->sentimento_naosei        = Input::get('sentimento_naosei');
             $anotacao->sentimento_outro         = Input::get('sentimento_outro');
+            $anotacao->vale_paranhana           = Input::get('vale_paranhana');
+
             if (Input::get('botao') === 'pular') {
                 $anotacao->pular = true;
             }
             $anotacao->save();
 
             //var_dump($anotacao->wasRecentlyCreated);
+            //var_dump($anotacao->idanotacao);
         }
 
+        //die('aqui');
         return redirect(route('anotacao'));
+    }
+
+    public function orientacao() {
+        return view('orientacao ');
     }
 }

@@ -4,7 +4,6 @@ docência
 ensino
 livre docência
 regência
-cargo
 cadeira
 cátedra
 pontifícia
@@ -12,6 +11,7 @@ estudante
 aluno
 aprendiz
 escolar
+escola
 discípulo
 novato
 noviço
@@ -24,24 +24,12 @@ recruta
 calouro
 lecionando
 aulista
-inexperiente
 praticante
 acadêmico
-novel
-iniciado
-adepto
-pixote
-aderente
 iniciante
-sectário
 prosélito
-sequaz
-académico
+acadêmico
 estudantaço
-galucho
-partidário
-pexote
-fiel
 ginasial
 incipiente
 estreante
@@ -56,8 +44,8 @@ bisonho
 caloiro
 catecúmeno
 cultural
-novo
 educacional
+educação
 inicial
 interno
 educativo
@@ -76,15 +64,12 @@ devoto
 habilitar
 pupilar
 instrutivo
-arara
 escolástico
 científico
 cursista
 normalista
 seminarista
 aprendente
-pupilo
-rookie
 pedagógico
 repetente
 adestrar
@@ -110,7 +95,6 @@ pipilo
 principiador
 colega
 condiscípulo
-semi-interno
 externo
 classe
 bicho
@@ -118,9 +102,6 @@ colegiado
 doutorando
 lecionando
 veterano
-camarada
-urso
-adepto
 estreante
 lecionado
 doutrinado
@@ -141,3 +122,6 @@ magistrando
 marçano
 sebenteiro
 tirocinante
+creche
+infantil
+quadro

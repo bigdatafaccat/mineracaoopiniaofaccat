@@ -42,6 +42,9 @@ class ImportacaoMongoSeeder extends Seeder
                             $sentenca->post_autor_name = $post['from']['name'];
                             $sentenca->similar_outra = false;
                             $sentenca->similaridade_analisada = false;
+                            $sentenca->pre_aspecto_saude = false;
+                            $sentenca->pre_aspecto_educacao = false;
+                            $sentenca->pre_aspecto_seguranca = false;
                             $sentenca->save();
                             //part of speech
                             if (isset($post_sentenca[2])) {
@@ -50,6 +53,13 @@ class ImportacaoMongoSeeder extends Seeder
                                     $partOfSpeech->idsentenca = $sentenca->idsentenca;
                                     $partOfSpeech->termo = $pos[0];
                                     $partOfSpeech->pos = $pos[1];
+                                    $partOfSpeech->termo_analisado = false;
+                                    $partOfSpeech->normalizado = false;
+                                    $partOfSpeech->pre_aspecto_saude = false;
+                                    $partOfSpeech->pre_aspecto_educacao = false;
+                                    $partOfSpeech->pre_aspecto_seguranca = false;
+                                    $partOfSpeech->pre_aspecto_analisado = false;
+
                                     $partOfSpeech->save();
                                     unset($partOfSpeech);
                                 }
@@ -111,6 +121,9 @@ class ImportacaoMongoSeeder extends Seeder
                                     $sentenca->comentario_autor_name = $comentario['from']['name'];
                                     $sentenca->similar_outra = false;
                                     $sentenca->similaridade_analisada = false;
+                                    $sentenca->pre_aspecto_saude = false;
+                                    $sentenca->pre_aspecto_educacao = false;
+                                    $sentenca->pre_aspecto_seguranca = false;
                                     $sentenca->save();
                                     //part of speech
                                     if (isset($comentario_sentenca[2])) {
@@ -119,6 +132,12 @@ class ImportacaoMongoSeeder extends Seeder
                                             $partOfSpeech->idsentenca = $sentenca->idsentenca;
                                             $partOfSpeech->termo = $pos[0];
                                             $partOfSpeech->pos = $pos[1];
+                                            $partOfSpeech->termo_analisado = false;
+                                            $partOfSpeech->normalizado = false;
+                                            $partOfSpeech->pre_aspecto_saude = false;
+                                            $partOfSpeech->pre_aspecto_educacao = false;
+                                            $partOfSpeech->pre_aspecto_seguranca = false;
+                                            $partOfSpeech->pre_aspecto_analisado = false;
                                             $partOfSpeech->save();
                                             unset($partOfSpeech);
                                         }
@@ -159,6 +178,9 @@ class ImportacaoMongoSeeder extends Seeder
                                                 $sentenca->comentario_comentario_autor_name = $comentario_comentario['from']['name'];
                                                 $sentenca->similar_outra = false;
                                                 $sentenca->similaridade_analisada = false;
+                                                $sentenca->pre_aspecto_saude = false;
+                                                $sentenca->pre_aspecto_educacao = false;
+                                                $sentenca->pre_aspecto_seguranca = false;
                                                 $sentenca->save();
                                                 //part of speech
                                                 if (isset($comentario_comentario_sentenca[2])) {
@@ -167,6 +189,12 @@ class ImportacaoMongoSeeder extends Seeder
                                                         $partOfSpeech->idsentenca = $sentenca->idsentenca;
                                                         $partOfSpeech->termo = $pos[0];
                                                         $partOfSpeech->pos = $pos[1];
+                                                        $partOfSpeech->termo_analisado = false;
+                                                        $partOfSpeech->normalizado = false;
+                                                        $partOfSpeech->pre_aspecto_saude = false;
+                                                        $partOfSpeech->pre_aspecto_educacao = false;
+                                                        $partOfSpeech->pre_aspecto_seguranca = false;
+                                                        $partOfSpeech->pre_aspecto_analisado = false;
                                                         $partOfSpeech->save();
                                                         unset($partOfSpeech);
                                                     }
