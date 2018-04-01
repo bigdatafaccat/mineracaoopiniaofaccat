@@ -54,6 +54,27 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereComentarioComentarioAutorName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePostAutorId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePostAutorName($value)
+ * @property bool|null $similaroutra
+ * @property bool|null $similar_outra
+ * @property bool|null $similaridade_analisada
+ * @property bool|null $pre_aspecto_saude
+ * @property bool|null $pre_aspecto_educacao
+ * @property bool|null $pre_aspecto_seguranca
+ * @property int|null $post_dia
+ * @property int|null $tamanho_sentenca_texto
+ * @property int|null $tamanho_comentario_texto
+ * @property int|null $tamanho_post_texto
+ * @property int|null $tamanho_comentario_comentario_texto
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePostDia($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePreAspectoEducacao($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePreAspectoSaude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca wherePreAspectoSeguranca($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereSimilaridadeAnalisada($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereSimilaroutra($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereTamanhoComentarioComentarioTexto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereTamanhoComentarioTexto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereTamanhoPostTexto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Sentenca whereTamanhoSentencaTexto($value)
  */
 class Sentenca extends Model
 {

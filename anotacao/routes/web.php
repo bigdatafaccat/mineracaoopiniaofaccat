@@ -29,6 +29,9 @@ Route::post('logout', 'Auth\LoginController@App\Http\Controllers\Auth\LoginContr
 Route::get('/', 'AnotacaoController@exibirSentenca')->name('anotacao')->middleware('auth');
 Route::get('/home', 'AnotacaoController@exibirSentenca')->name('anotacao')->middleware('auth');
 Route::get('/anotacao', 'AnotacaoController@exibirSentenca')->name('anotacao')->middleware('auth');
+Route::get('/anotacaodivergente', 'AnotacaoController@exibirSentencaDivergente')->name('anotacaodivergente')->middleware('auth');
+
 Route::post('/anotar', 'AnotacaoController@registrarAnotacao')->name('anotar')->middleware('auth');
+Route::post('/anotardivergente', 'AnotacaoController@registrarAnotacaoDivergente')->name('anotardivergente')->middleware('auth');
 
 Route::get('/orientacao', 'AnotacaoController@orientacao')->name('orientacao')->middleware('auth');

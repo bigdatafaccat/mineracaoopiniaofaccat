@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Reacao whereTipo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Reacao whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string|null $type
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Reacao whereType($value)
  */
 class Reacao extends Model
 {

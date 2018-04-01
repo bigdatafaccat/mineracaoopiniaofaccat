@@ -7,19 +7,23 @@ from time import gmtime, strftime
 
 
 def analisar_anotacao_de_opiniao():
-	cur.execute("select idsentenca, count(*) as anotacoes, count(distinct(opiniao)) as opinioes_diferentes, mode() WITHIN GROUP (ORDER BY opiniao) AS moda from anotacao group by 1 order by 1")
+	cur.execute("select idsentenca, count(*) as anotacoes, count(distinct(coalesce(opiniao, '0'))) as opinioes_diferentes, mode() WITHIN GROUP (ORDER BY opiniao) AS moda from anotacao group by 1 order by 1")
 	result = cur.fetchall()
 	for registro in result:
 		idsentenca = registro[0]
 		anotacoes = registro[1]
-		opinioes_diferentes = registro[2]
+		anotacoes_diferentes = registro[2]
 		moda = registro[3] #valor que mais se repete
-		if (anotacoes >= 2 and ((anotacoes - opinioes_diferentes) > 0)):
-			#então pode considerar sentenca para treino
-			cur.execute("insert into documento_para_treino (idsentenca, tipo, variavel_dependente) values ("+str(idsentenca)+", 'opiniao', '"+str(moda)+"')")
-		elif (anotacoes >= 2 and ((anotacoes - opinioes_diferentes) == 0)):
+		
+		if (anotacoes >= 2 and (((anotacoes - anotacoes_diferentes) == 0))):
 			#precisa reanotar
 			cur.execute("insert into anotacao_divergente (idsentenca, tipo) values ("+str(idsentenca)+", 'opiniao')")
+			
+			
+		elif (anotacoes >= 2 and ((anotacoes - anotacoes_diferentes) > 0)):
+			#então pode considerar sentenca para treino
+			cur.execute("insert into documento_para_treino (idsentenca, tipo, variavel_dependente) values ("+str(idsentenca)+", 'opiniao', '"+str(moda)+"')")
+		
 
 def analisar_anotacao_de_assuntos():
 	assuntos = ['saude', 'educacao', 'seguranca']
@@ -27,7 +31,7 @@ def analisar_anotacao_de_assuntos():
 		analisar_anotacao_de_assunto(assunto)	
 
 def analisar_anotacao_de_assunto(assunto):
-	q = "select idsentenca, count(*) as anotacoes, count(distinct(assunto_"+assunto+")) as anotacoes_diferentes, mode() WITHIN GROUP (ORDER BY assunto_"+assunto+") AS moda from anotacao group by 1 order by 1"
+	q = "select idsentenca, count(*) as anotacoes, count(distinct(coalesce(assunto_"+assunto+", '0'))) as anotacoes_diferentes, mode() WITHIN GROUP (ORDER BY assunto_"+assunto+") AS moda from anotacao group by 1 order by 1"
 	cur.execute(q)
 	result = cur.fetchall()
 	for registro in result:
@@ -40,12 +44,18 @@ def analisar_anotacao_de_assunto(assunto):
 		if (moda):
 			menciona_assunto = assunto
 		
-		if (anotacoes >= 2 and ((anotacoes - anotacoes_diferentes) > 0) and moda):
+		
+		if (anotacoes >= 2 and (((anotacoes - anotacoes_diferentes) == 0))):
+			#precisa reanotar
+			cur.execute("insert into anotacao_divergente (idsentenca, tipo) values ("+str(idsentenca)+", 'assunto')")
+			
+		elif (anotacoes >= 2 and ((anotacoes - anotacoes_diferentes) > 0) and moda):
 			#então pode considerar sentenca para treino
 			cur.execute("insert into documento_para_treino (idsentenca, tipo, variavel_dependente) values ("+str(idsentenca)+", 'assunto', '"+str(menciona_assunto)+"')")
-		elif (anotacoes >= 2 and ((anotacoes - anotacoes_diferentes) == 0)):
-			#precisa reanotar
-			cur.execute("insert into anotacao_divergente (idsentenca, tipo) values ("+str(idsentenca)+", 'assunto')")			
+			
+			
+			
+					
 
 if __name__ == '__main__':
 	

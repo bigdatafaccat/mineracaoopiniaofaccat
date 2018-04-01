@@ -20,6 +20,22 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\PartOfSpeech whereTermo($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\PartOfSpeech whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string|null $termo_sem_acentuacao
+ * @property string|null $termo_com_stem
+ * @property bool|null $normalizado
+ * @property bool|null $termo_analisado
+ * @property bool|null $pre_aspecto_saude
+ * @property bool|null $pre_aspecto_educacao
+ * @property bool|null $pre_aspecto_seguranca
+ * @property bool|null $pre_aspecto_analisado
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PartOfSpeech whereNormalizado($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PartOfSpeech wherePreAspectoAnalisado($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PartOfSpeech wherePreAspectoEducacao($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PartOfSpeech wherePreAspectoSaude($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PartOfSpeech wherePreAspectoSeguranca($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PartOfSpeech whereTermoAnalisado($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PartOfSpeech whereTermoComStem($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\PartOfSpeech whereTermoSemAcentuacao($value)
  */
 class PartOfSpeech extends Model
 {
