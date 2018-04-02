@@ -1,9 +1,11 @@
-import psycopg2
 from time import gmtime, strftime
 from unicodedata import normalize
-import nltk
 import math
 from time import gmtime, strftime
+import sys 
+import os
+sys.path.append(os.path.abspath("../"))
+from conexao import *
 
 
 def analisar_anotacao_de_opiniao():
@@ -61,11 +63,6 @@ if __name__ == '__main__':
 	
 	
 	inicio = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-	
-	try:
-		conn = psycopg2.connect("dbname='anotacao' user='leonardo' host='localhost' password='leonardo'")
-	except:
-		print("I am unable to connect to the database")
 	
 	cur = conn.cursor()
 	#limpa tabela com anotacoes divergentes
