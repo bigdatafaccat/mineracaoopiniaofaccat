@@ -2,11 +2,11 @@ import psycopg2
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from time import gmtime, strftime
+import sys 
+import os
+sys.path.append(os.path.abspath("../"))
+from conexao import *
 
-try:
-    conn = psycopg2.connect("dbname='anotacao' user='leonardo' host='localhost' password='leonardo'")
-except:
-    print("I am unable to connect to the database")
 
 cur = conn.cursor()
 

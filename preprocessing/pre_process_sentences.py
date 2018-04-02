@@ -4,6 +4,10 @@ from unicodedata import normalize
 import nltk
 import math
 from time import gmtime, strftime
+import sys 
+import os
+sys.path.append(os.path.abspath("../"))
+from conexao import *
 
 
 def pre_process_sentences():
@@ -20,11 +24,6 @@ if __name__ == '__main__':
 	
 	inicio = strftime("%Y-%m-%d %H:%M:%S", gmtime())
 	
-	try:
-		conn = psycopg2.connect("dbname='anotacao' user='leonardo' host='localhost' password='leonardo'")
-	except:
-		print("I am unable to connect to the database")
-
 	pre_process_sentences()
 	
 	conn.commit()
