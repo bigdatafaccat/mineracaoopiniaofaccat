@@ -9,7 +9,7 @@ from conexao import *
 
 
 def analisar_anotacao_de_opiniao():
-	cur.execute("select idsentenca, count(*) as anotacoes, count(distinct(coalesce(opiniao, '0'))) as opinioes_diferentes, mode() WITHIN GROUP (ORDER BY opiniao) AS moda from anotacao group by 1 order by 1")
+	cur.execute("select idsentenca, count(*) as anotacoes, count(distinct(coalesce(opiniao, '0'))) as opinioes_diferentes, mode() WITHIN GROUP (ORDER BY coalesce(opiniao, 'nenhuma')) AS moda from anotacao group by 1 order by 1")
 	result = cur.fetchall()
 	for registro in result:
 		idsentenca = registro[0]
