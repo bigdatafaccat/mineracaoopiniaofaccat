@@ -131,7 +131,7 @@ class AnotacaoController extends Controller
 
     public function exibirSentencaDivergente() {
         $string = "idsentenca in (select idsentenca from anotacao_divergente)";
-        $sentenca = Sentenca::whereRaw($string)->first();
+        $sentenca = Sentenca::whereRaw($string)->orderBy('idsentenca')->first();
         return view('anotacao_divergente', ['sentenca' => $sentenca]);
     }
 
