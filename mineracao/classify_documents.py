@@ -37,7 +37,7 @@ def feature_scaling(X_train, X_test):
     X_test = sc.transform(X_test)
     return [X_train, X_test]
 
-def naive(X_train, y_train, X_test, realizar_scaling = False):
+def naive(X_train, y_train, X_test, y_test, realizar_scaling = False):
     print("")
     print("")
     print("Naive Bayes")
@@ -58,20 +58,7 @@ def naive(X_train, y_train, X_test, realizar_scaling = False):
     return y_pred
 
 
-def cross_fold(X_train, y_train, X_test, classifier):
-    from sklearn.model_selection import cross_val_score, cross_validate
-    acuracia = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
-    
-    resultado = cross_validate(estimator = classifier, X = X_train, y = y_train, cv = 10)
-    #TODO: apresentar resultados do cross fold validation no mesmo formato do metrics.classification_report(y_test, y_pred)
-    #print(resultado) #isso aqui não funciona
-    
-    print ("Acurácia do cross fold: %s" % acuracia.mean())
-    
-    
-
-
-def svm(X_train, y_train, X_test, realizar_scaling = False):
+def svm(X_train, y_train, X_test, y_test, realizar_scaling = False):
     print("")
     print("")
     print("SVM")
@@ -91,7 +78,7 @@ def svm(X_train, y_train, X_test, realizar_scaling = False):
     cross_fold(X_train, y_train, X_test, classifier)
     return y_pred
 
-def xgboost(X_train, y_train, X_test, realizar_scaling = False):
+def xgboost(X_train, y_train, X_test, y_test, realizar_scaling = False):
     print("")
     print("")
     print("XGBoost")
@@ -109,7 +96,7 @@ def xgboost(X_train, y_train, X_test, realizar_scaling = False):
     cross_fold(X_train, y_train, X_test, classifier)
     return y_pred
 
-def random_tree(X_train, y_train, X_test, realizar_scaling = False):
+def random_tree(X_train, y_train, X_test, y_test, realizar_scaling = False):
     print("")
     print("")
     print("Random tree")
@@ -194,51 +181,62 @@ def pipeline_SGDClassifier_com_parametros_dinamicos(corpus, y):
 
 def pipeline_svm_com_parametros_dinamicos(corpus, y):
     X = corpus
-    y = dataset.iloc[:, 1].values
+    #y = dataset.iloc[:, 1].values
                     
     from sklearn.cross_validation import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 0)                
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.5, random_state = 0)                
                     
     from sklearn.model_selection import GridSearchCV
     parameters = {'vect__ngram_range': [(1, 1), (1, 2), (1, 3), (1, 4)],
                   'vect__max_features': (None, 1000, 10000, 100000),
                   'tfidf__use_idf': (True, False),
-                  'clf__kernel': ('linear', 'rbf', 'poly'),
+                  'clf__kernel': ['linear', 'rbf', 'poly'],
+                  'clf__C': [1,10],
+                  'clf__gamma': [0.001, 0.0001],
                   'clf__cache_size': (100, 200, 300, 400)
     }
     
     from sklearn.svm import SVC
     from sklearn.pipeline import Pipeline
-    text_clf = Pipeline([('vect', CountVectorizer()),
-                         ('tfidf', TfidfTransformer()),
-                         ('clf', SVC())])
     
-    #text_clf.fit(X_train, y_train)  
-    gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
-    gs_clf.fit(X_train, y_train)
-    y_pred = gs_clf.predict(X_test)
-    #gs_clf = gs_clf.fit(X_train, y_train)
+    text_clf = Pipeline(
+            [
+                    ('vect', CountVectorizer()),
+                    ('tfidf', TfidfTransformer()),
+                    ('clf', SVC())
+            ],
+            #[
+            #        ('vect', CountVectorizer()),
+            #        ('clf', SVC())
+            #]
+    )
+    
+    
+    text_clf.fit(X_train, y_train)  
+    clf = GridSearchCV(text_clf, parameters, n_jobs=-1, cv=10)
+    clf.fit(X_train, y_train)
     
     #apresenta os parametros que geraram os melhores resultados
-    print("Melhor resultado: %s" % gs_clf.best_score_)
-    for param_name in sorted(parameters.keys()):
-        print("%s: %r" % (param_name, gs_clf.best_params_[param_name]))
+    print("Melhor resultado: %s" % clf.best_score_)
+    print("Melhores parametros: %s" % clf.best_params_)
     
-                     
-    
-    #y_pred = text_clf.predict(X_test)
-    text_clf = Pipeline([('vect', CountVectorizer(max_features=None, ngram_range=(1,2))),
-                         ('tfidf', TfidfTransformer(use_idf=True)),
-                         ('clf', SVC(kernel = 'linear', cache_size=100))])
-    text_clf.fit(X_train, y_train)
-    y_pred = text_clf.predict(X_test)
-    
+    melhor_classificador = clf.best_estimator_
+    melhor_classificador.fit(X_train, y_train)
+    y_pred = melhor_classificador.predict(X_test)
     avaliar(y_test, y_pred)
-    cross_fold(X_train, y_train, X_test, text_clf)
+    
     return y_pred
 
 
-
+def cross_fold(X_train, y_train, X_test, classifier):
+    from sklearn.model_selection import cross_val_score, cross_validate
+    acuracia = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
+    
+    resultado = cross_validate(estimator = classifier, X = X_train, y = y_train, cv = 10)
+    #TODO: apresentar resultados do cross fold validation no mesmo formato do metrics.classification_report(y_test, y_pred)
+    #print(resultado) #isso aqui não funciona
+    
+    print ("Acurácia do cross fold: %s" % acuracia.mean())
 
 
 
@@ -252,12 +250,39 @@ def avaliar(y_test, y_pred):
     print (resultado)
     print ("Acurácia: %s" % acuracia)
 
-def get_dataset():
+def get_dataset_opinioes():
     # Importing the dataset
     #dataset = pd.read_csv('Restaurant_Reviews.tsv', delimiter = '\t', quoting = 3)
     conn = psycopg2.connect(string_conexao)
     cur = conn.cursor()
     sql = "select s.texto, case when d.variavel_dependente = 'positiva' then 1 else 0 end as variavel_dependente from documento_para_treino d inner join sentenca s using (idsentenca) where d.variavel_dependente in ('positiva', 'negativa')"
+    cur.execute(sql)
+    
+    dataset = pd.DataFrame(cur.fetchall(), columns=['texto', 'variavel_dependente'])
+    
+    cur.close()
+    conn.close()
+    return dataset
+
+
+def get_dataset_assunto(assunto):
+    # Importing the dataset
+    #dataset = pd.read_csv('Restaurant_Reviews.tsv', delimiter = '\t', quoting = 3)
+    conn = psycopg2.connect(string_conexao)
+    cur = conn.cursor()
+    sql = """
+      select case 
+              when s.tipo_texto = 'post' then s.post_texto
+              when s.tipo_texto = 'comentario' then s.post_texto || s.comentario_texto
+              when s.tipo_texto = 'comentario_de_comentario' then s.post_texto || s.comentario_texto
+            end as texto, 
+            case 
+              when d.variavel_dependente = '"""+assunto+"""' then 1 
+              else 0 
+            end as variavel_dependente 
+       from documento_para_treino d 
+     inner join sentenca s using (idsentenca)
+      where d.tipo in ('assunto')"""
     cur.execute(sql)
     
     dataset = pd.DataFrame(cur.fetchall(), columns=['texto', 'variavel_dependente'])
@@ -292,39 +317,60 @@ def prepare_corpus(dataset):
     return corpus
 
 
+def aplicar_classificador(alvo):
+    if (alvo == 'opiniao'):
+        dataset = get_dataset_opinioes()
+    else:
+        dataset = get_dataset_assunto(alvo)
+    
+        
+    print(alvo.upper())
+    
+    corpus = prepare_corpus(dataset)
+    # Creating the Bag of Words model
+    from sklearn.feature_extraction.text import CountVectorizer
+    #cv = CountVectorizer(max_features = 150000)
+    #cv = CountVectorizer(ngram_range = (1, 3))
+    cv = CountVectorizer()
+    X = cv.fit_transform(corpus).toarray()
+    y = dataset.iloc[:, 1].values
+    
+                    
+    #from sklearn.feature_extraction.text import TfidfTransformer
+    #tf_transformer = TfidfTransformer(use_idf=False).fit(X)
+    #tf_transformer = TfidfTransformer().fit(X)
+    #X = tf_transformer.transform(X).toarray()                
+    
+    # Splitting the dataset into the Training set and Test set
+    from sklearn.cross_validation import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.5, random_state = 0)
+    
+    naive(X_train, y_train, X_test, y_test)
+    naive(X_train, y_train, X_test, y_test, realizar_scaling=True)
+    svm(X_train, y_train, X_test, y_test)
+    svm(X_train, y_train, X_test, y_test, realizar_scaling=True)
+    random_tree(X_train, y_train, X_test, y_test)
+    random_tree(X_train, y_train, X_test, y_test, realizar_scaling=True)
+    xgboost(X_train, y_train, X_test, y_test)
+    xgboost(X_train, y_train, X_test, y_test, realizar_scaling=True)
+    #pipeline_SGDClassifier(corpus, y)
+    #pipeline_SGDClassifier_com_parametros_dinamicos(corpus, y)
+    pipeline_svm_com_parametros_dinamicos(corpus, y)
+    print("")
+    print("")
+    print("")
+    print("")
+    print("")
+    print("")
 
-dataset = get_dataset()
-corpus = prepare_corpus(dataset)
+def main():
+    
+    lista = ['opiniao', 'saude', 'educacao', 'seguranca']
+    for item in lista:
+        aplicar_classificador(item)
+    
+    
+    
 
-# Creating the Bag of Words model
-from sklearn.feature_extraction.text import CountVectorizer
-#cv = CountVectorizer(max_features = 150000)
-#cv = CountVectorizer(ngram_range = (1, 3))
-cv = CountVectorizer()
-X = cv.fit_transform(corpus).toarray()
-y = dataset.iloc[:, 1].values
-
-                
-from sklearn.feature_extraction.text import TfidfTransformer
-#tf_transformer = TfidfTransformer(use_idf=False).fit(X)
-tf_transformer = TfidfTransformer().fit(X)
-X = tf_transformer.transform(X).toarray()                
-
-# Splitting the dataset into the Training set and Test set
-from sklearn.cross_validation import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
-
-#naive(X_train, y_train, X_test)
-#naive(X_train, y_train, X_test, realizar_scaling=True)
-#svm(X_train, y_train, X_test)
-#svm(X_train, y_train, X_test, realizar_scaling=True)
-#random_tree(X_train, y_train, X_test)
-#random_tree(X_train, y_train, X_test, realizar_scaling=True)
-#xgboost(X_train, y_train, X_test)
-#xgboost(X_train, y_train, X_test, realizar_scaling=True)
-#pipeline_SGDClassifier(corpus, y)
-#pipeline_SGDClassifier_com_parametros_dinamicos(corpus, y)
-pipeline_svm_com_parametros_dinamicos(corpus, y)
-
-
-
+if __name__ == "__main__":
+    main()
