@@ -34,6 +34,7 @@ from sklearn.preprocessing import FunctionTransformer
 import warnings
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
+from sklearn.neural_network import MLPClassifier
 
 
 def mesclar_parametros(parametros1, parametros2):
@@ -489,6 +490,44 @@ def obter_classificador_SDG():
     return [classificador, parametros, pipeline]
 
 
+def obter_classificador_MLP():
+    print("MLP")
+    
+    parametros = {'clf__activation': ['identity', 'logistic', 'tanh', 'relu'],
+                  'clf__alpha': [1e-05],
+                  'clf__batch_size': ['auto'],
+                  'clf__beta_1': [0.9],
+                  'clf__beta_2': [0.999],
+                  'clf__early_stopping': [True, False],
+                  'clf__epsilon': [1e-8],
+                  'clf__hidden_layer_sizes': [(5,), (10,), (15,), (30,3)],
+                  'clf__learning_rate': ['constant'],
+                  'clf__learning_rate_init': [0.001],
+                  'clf__max_iter': [200],
+                  'clf__momentum': [0.9],
+                  'clf__nesterovs_momentum': [True, False],
+                  'clf__power_t': [0.5],
+                  'clf__shuffle': [True, False],
+                  'clf__solver': ['lbfgs', 'sgd', 'adam'],
+                  'clf__tol': [0.0001],
+                  'clf__validation_fraction': [0.1],
+                  'clf__warm_start': [True, False]
+    }
+    
+    classificador = MLPClassifier()
+    pipeline = Pipeline(
+            [
+                    ('vect', CountVectorizer()),
+                    ('tfidf', TfidfTransformer()),
+                    ('to_dense', DenseTransformer()),
+                    ('clf', classificador)
+            ],
+    )
+    
+    
+    return [classificador, parametros, pipeline]
+
+
 
 def aplicar_classificador(alvo):
     if (alvo == 'opiniao'):
@@ -518,19 +557,30 @@ def aplicar_classificador(alvo):
     #y = dataset.iloc[:, 1].values
     #from sklearn.cross_validation import train_test_split
     #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.5, random_state = 0)
+    #classifier = MLPClassifier(solver='lbfgs', alpha=1e-5,
+    #                hidden_layer_sizes=(15,), random_state=1)
+    
+    #classifier.fit(X_train, y_train)
+    #y_pred = classifier.predict(X_test)
+    #avaliar(y_test, y_pred)
+    
+    
     #xgboost(X_train, y_train, X_test, y_test)
     
     
-    classificar_com_pipeline(dataset, obter_classificador_svm())
-    gc.collect()
-    classificar_com_pipeline(dataset, obter_classificador_naive())
-    gc.collect()
-    classificar_com_pipeline(dataset, obter_classificador_random_tree())
-    gc.collect()
-    classificar_com_pipeline(dataset, obter_classificador_SDG())
-    gc.collect()
-    classificar_com_pipeline(dataset, obter_classificador_xgboost())
-    gc.collect()
+    #classificar_com_pipeline(dataset, obter_classificador_svm())
+    #gc.collect()
+    #classificar_com_pipeline(dataset, obter_classificador_naive())
+    #gc.collect()
+    #classificar_com_pipeline(dataset, obter_classificador_random_tree())
+    #gc.collect()
+    #classificar_com_pipeline(dataset, obter_classificador_SDG())
+    #gc.collect()
+    #classificar_com_pipeline(dataset, obter_classificador_xgboost())
+    #gc.collect()
+    
+    classificar_com_pipeline(dataset, obter_classificador_MLP())
+    #gc.collect()
     
     #TODO: rede neural
     #http://scikit-learn.org/stable/modules/neural_networks_supervised.html
