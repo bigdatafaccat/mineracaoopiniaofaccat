@@ -1,4 +1,6 @@
 #http://scikit-learn.org/stable/tutorial/text_analytics/working_with_text_data.html
+#https://stackoverflow.com/questions/28384680/scikit-learns-pipeline-a-sparse-matrix-was-passed-but-dense-data-is-required
+#http://zacstewart.com/2014/08/05/pipelines-of-featureunions-of-pipelines.html
 
 
 from time import gmtime, strftime
@@ -23,10 +25,26 @@ import re
 import nltk
 #nltk.download('stopwords')
 from nltk.corpus import stopwords
+import gc
+
+from densetransformer import DenseTransformer
+from sklearn.preprocessing import FunctionTransformer
 
 #Não apresenta mensagens de warning
 import warnings
-warnings.filterwarnings("ignore")
+from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
+
+
+def mesclar_parametros(parametros1, parametros2):
+    
+    #funciona para Python abaixo de 3.4
+    #z = parametros1.copy()   # start with x's keys and values
+    #z.update(parametros2)    # modifies z with y's keys and values & returns None
+    #return z
+    
+    #funciona para Python acima de 3.5
+    return {**parametros1, **parametros2}
 
 
 def feature_scaling(X_train, X_test):
@@ -228,6 +246,43 @@ def pipeline_svm_com_parametros_dinamicos(corpus, y):
     return y_pred
 
 
+def classificar_com_pipeline(dataset, propriedades_classificador):
+    classificador, parametros, pipeline = propriedades_classificador
+    
+    parametros_comuns = {
+        'vect__ngram_range': [(1, 1), (1, 2), (1, 3), (1, 4)],
+        'vect__max_features': (None, 1000, 10000, 100000, 200000),
+        'tfidf__use_idf': (True, False)
+    }
+    parametros_mesclados = mesclar_parametros(parametros_comuns, parametros)
+    
+    X_train, X_test, y_train, y_test = obter_treino_teste(dataset)
+    
+    #pipeline = Pipeline(
+    #        [
+    #                ('vect', CountVectorizer()),
+    #                ('tfidf', TfidfTransformer()),
+    #                ('clf', classificador)
+    #        ],
+    #)
+    
+    
+    pipeline.fit(X_train, y_train)  
+    clf = GridSearchCV(pipeline, parametros_mesclados, n_jobs=-1, cv=10)
+    clf.fit(X_train, y_train)
+    
+    #apresenta os parametros que geraram os melhores resultados
+    print("Melhor resultado: %s" % clf.best_score_)
+    print("Melhores parametros: %s" % clf.best_params_)
+    
+    melhor_classificador = clf.best_estimator_
+    melhor_classificador.fit(X_train, y_train)
+    y_pred = melhor_classificador.predict(X_test)
+    avaliar(y_test, y_pred)
+    
+    return y_pred
+
+
 def cross_fold(X_train, y_train, X_test, classifier):
     from sklearn.model_selection import cross_val_score, cross_validate
     acuracia = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
@@ -317,45 +372,170 @@ def prepare_corpus(dataset):
     return corpus
 
 
+def obter_treino_teste(dataset):
+    
+    corpus = prepare_corpus(dataset)
+    
+    X = corpus
+    y = dataset.iloc[:, 1].values
+    
+    from sklearn.cross_validation import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.5, random_state = 0)
+    return [X_train, X_test, y_train, y_test]
+    
+
+def obter_classificador_svm():
+    print("SVM")
+    parametros = {'clf__kernel': ['linear', 'rbf', 'poly'],
+                  'clf__C': [1,10],
+                  'clf__gamma': [0.001, 0.0001],
+                  'clf__cache_size': (100, 200, 300, 400)
+    }
+    
+    from sklearn.svm import SVC
+    classificador = SVC()
+    
+    pipeline = Pipeline(
+            [
+                    ('vect', CountVectorizer()),
+                    ('tfidf', TfidfTransformer()),
+                    ('clf', classificador)
+            ],
+    )
+    
+    
+    return [classificador, parametros, pipeline]
+
+def obter_classificador_naive():
+    print("NAIVE BAYES")
+    parametros = {
+    }
+    
+    from sklearn.naive_bayes import GaussianNB
+    classificador = GaussianNB()
+    
+    pipeline = Pipeline(
+            [
+                    ('vect', CountVectorizer()),
+                    ('tfidf', TfidfTransformer()),
+                    ('to_dense', DenseTransformer()),
+                    ('clf', classificador)
+            ],
+    )
+    
+    
+    return [classificador, parametros, pipeline]
+    
+
+def obter_classificador_random_tree():
+    print("RANDOM TREE")
+    parametros = {
+    }
+    
+    from sklearn.tree import DecisionTreeClassifier
+    classificador = DecisionTreeClassifier(criterion = 'entropy', random_state = 0)
+    pipeline = Pipeline(
+            [
+                    ('vect', CountVectorizer()),
+                    ('tfidf', TfidfTransformer()),
+                    ('clf', classificador)
+            ],
+    )
+    
+    
+    return [classificador, parametros, pipeline]
+
+
+def obter_classificador_xgboost():
+    print("XGBOOST")
+    parametros = {
+    }
+    
+    from xgboost import XGBClassifier
+    classificador = XGBClassifier()
+    pipeline = Pipeline(
+            [
+                    ('vect', CountVectorizer()),
+                    ('tfidf', TfidfTransformer()),
+                    ('to_dense', DenseTransformer()),
+                    ('clf', classificador)
+            ],
+    )
+    
+    
+    return [classificador, parametros, pipeline]
+
+def obter_classificador_SDG():
+    print("SDG")
+    parametros = {'clf__loss': ['hinge'],
+                  'clf__penalty': ['l2'],
+                  'clf__alpha': [1e-3],
+                  'clf__random_state': [0, None],
+                  'clf__n_iter': [5],
+                  'clf__tol': [None]
+    }
+    
+    from sklearn.linear_model import SGDClassifier
+    classificador = SGDClassifier()
+    pipeline = Pipeline(
+            [
+                    ('vect', CountVectorizer()),
+                    ('tfidf', TfidfTransformer()),
+                    ('clf', classificador)
+            ],
+    )
+    
+    
+    return [classificador, parametros, pipeline]
+
+
+
 def aplicar_classificador(alvo):
     if (alvo == 'opiniao'):
         dataset = get_dataset_opinioes()
     else:
         dataset = get_dataset_assunto(alvo)
     
-        
     print(alvo.upper())
     
-    corpus = prepare_corpus(dataset)
-    # Creating the Bag of Words model
-    from sklearn.feature_extraction.text import CountVectorizer
-    #cv = CountVectorizer(max_features = 150000)
-    #cv = CountVectorizer(ngram_range = (1, 3))
-    cv = CountVectorizer()
-    X = cv.fit_transform(corpus).toarray()
-    y = dataset.iloc[:, 1].values
-    
-                    
-    #from sklearn.feature_extraction.text import TfidfTransformer
-    #tf_transformer = TfidfTransformer(use_idf=False).fit(X)
-    #tf_transformer = TfidfTransformer().fit(X)
-    #X = tf_transformer.transform(X).toarray()                
-    
-    # Splitting the dataset into the Training set and Test set
-    from sklearn.cross_validation import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.5, random_state = 0)
-    
-    naive(X_train, y_train, X_test, y_test)
-    naive(X_train, y_train, X_test, y_test, realizar_scaling=True)
-    svm(X_train, y_train, X_test, y_test)
-    svm(X_train, y_train, X_test, y_test, realizar_scaling=True)
-    random_tree(X_train, y_train, X_test, y_test)
-    random_tree(X_train, y_train, X_test, y_test, realizar_scaling=True)
-    xgboost(X_train, y_train, X_test, y_test)
-    xgboost(X_train, y_train, X_test, y_test, realizar_scaling=True)
+    #naive(X_train, y_train, X_test, y_test)
+    #naive(X_train, y_train, X_test, y_test, realizar_scaling=True)
+    #svm(X_train, y_train, X_test, y_test)
+    #svm(X_train, y_train, X_test, y_test, realizar_scaling=True)
+    #random_tree(X_train, y_train, X_test, y_test)
+    #random_tree(X_train, y_train, X_test, y_test, realizar_scaling=True)
+    #xgboost(X_train, y_train, X_test, y_test)
+    #xgboost(X_train, y_train, X_test, y_test, realizar_scaling=True)
     #pipeline_SGDClassifier(corpus, y)
     #pipeline_SGDClassifier_com_parametros_dinamicos(corpus, y)
-    pipeline_svm_com_parametros_dinamicos(corpus, y)
+    #pipeline_svm_com_parametros_dinamicos(corpus, y)
+    
+    
+    #corpus = prepare_corpus(dataset)
+    #cv = CountVectorizer()
+    #X = cv.fit_transform(corpus).todense()
+    #X = corpus
+    #y = dataset.iloc[:, 1].values
+    #from sklearn.cross_validation import train_test_split
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.5, random_state = 0)
+    #xgboost(X_train, y_train, X_test, y_test)
+    
+    
+    classificar_com_pipeline(dataset, obter_classificador_svm())
+    gc.collect()
+    classificar_com_pipeline(dataset, obter_classificador_naive())
+    gc.collect()
+    classificar_com_pipeline(dataset, obter_classificador_random_tree())
+    gc.collect()
+    classificar_com_pipeline(dataset, obter_classificador_SDG())
+    gc.collect()
+    classificar_com_pipeline(dataset, obter_classificador_xgboost())
+    gc.collect()
+    
+    #TODO: rede neural
+    #http://scikit-learn.org/stable/modules/neural_networks_supervised.html
+    
+    
     print("")
     print("")
     print("")
@@ -369,8 +549,14 @@ def main():
     for item in lista:
         aplicar_classificador(item)
     
-    
-    
-
 if __name__ == "__main__":
+    inicio = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+    print("Início do script")
+    print(inicio)
+    warnings.filterwarnings("ignore")
     main()
+    print("Início do script")
+    print(inicio)
+    print("Fim do script")
+    print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+    
