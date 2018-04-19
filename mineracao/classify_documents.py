@@ -300,7 +300,7 @@ class ClassifyDocuments(object):
         
         
         pipeline.fit(X_train, y_train)  
-        clf = GridSearchCV(pipeline, parametros_mesclados, n_jobs=-1, cv=2)
+        clf = GridSearchCV(pipeline, parametros_mesclados, n_jobs=-1, cv=10)
         clf.fit(X_train, y_train)
         
         #apresenta os parametros que geraram os melhores resultados
@@ -557,7 +557,9 @@ class ClassifyDocuments(object):
         
         #http://scikit-learn.org/stable/modules/neural_networks_supervised.html
         
-        parametros = {'clf__activation': ['identity', 'logistic', 'tanh', 'relu'],
+        parametros = {
+                      'clf__activation': ['identity', 'logistic', 'tanh', 'relu'],
+                      #'clf__activation': ['relu'],
                       'clf__alpha': [1e-05],
                       'clf__batch_size': ['auto'],
                       'clf__beta_1': [0.9],
@@ -565,6 +567,7 @@ class ClassifyDocuments(object):
                       'clf__early_stopping': [True, False],
                       'clf__epsilon': [1e-8],
                       'clf__hidden_layer_sizes': [(5,), (10,), (15,), (30,3)],
+                      #'clf__hidden_layer_sizes': [(5,), (10,)],
                       'clf__learning_rate': ['constant', 'invscaling', 'adaptive'],
                       'clf__learning_rate_init': [0.001],
                       'clf__max_iter': [200],
@@ -578,7 +581,14 @@ class ClassifyDocuments(object):
                       'clf__warm_start': [True, False]
         }
         
-        classificador = MLPClassifier(self)
+        #parametros = {
+        #        'clf__hidden_layer_sizes': [(5,2)],
+        #        'clf__solver': ['lbfgs'],
+        #        'clf__alpha': [1e-5],
+        #        'clf__random_state': [1]
+        #}
+        
+        classificador = MLPClassifier()
         pipeline = Pipeline(
                 [
                         ('vect', CountVectorizer()),
@@ -634,19 +644,18 @@ class ClassifyDocuments(object):
         #xgboost(X_train, y_train, X_test, y_test)
         
         
-        #self.classificar_com_pipeline(dataset, self.obter_classificador_svm())
-        #gc.collect()
+        self.classificar_com_pipeline(dataset, self.obter_classificador_svm())
+        gc.collect()
         self.classificar_com_pipeline(dataset, self.obter_classificador_naive())
-        #gc.collect()
-        #self.classificar_com_pipeline(dataset, self.obter_classificador_random_tree())
-        #gc.collect()
-        #self.classificar_com_pipeline(dataset, self.obter_classificador_SDG())
-        #gc.collect()
-        #self.classificar_com_pipeline(dataset, self.obter_classificador_xgboost())
-        #gc.collect()
-        
-        #classificar_com_pipeline(dataset, obter_classificador_MLP())
-        #gc.collect()
+        gc.collect()
+        self.classificar_com_pipeline(dataset, self.obter_classificador_random_tree())
+        gc.collect()
+        self.classificar_com_pipeline(dataset, self.obter_classificador_SDG())
+        gc.collect()
+        self.classificar_com_pipeline(dataset, self.obter_classificador_xgboost())
+        gc.collect()
+        self.classificar_com_pipeline(dataset, self.obter_classificador_MLP())
+        gc.collect()
         
         #Trabalhos futuros
         #Implementar RNN com LSTM
@@ -658,6 +667,24 @@ class ClassifyDocuments(object):
         print("")
         print("")
         print("")
+        
+        
+    def obterUltimoLote(self):
+        sql = "select (coalesce(max(lote_numero), 0) + 1) as lote from experimentos_avaliacao_resultado"
+        cur = self.conn.cursor()
+        cur.execute(sql)
+        registro = cur.fetchall()
+        cur.close()
+        self.lote = registro[0][0]
+        
+    def atualizarExperimentosEmLote(self):
+        sql = "update experimentos_avaliacao_resultado set lote_fim = %s where lote_numero = %s"
+        parametros = (self.fim, self.lote)
+        cur = self.conn.cursor()
+        cur.execute(sql, parametros)
+        self.conn.commit()
+        cur.close()
+        
         
     def registrarExperimento(self):
         
@@ -719,14 +746,14 @@ class ClassifyDocuments(object):
             str(self.experimento.melhor_classificador)
         )
         
-        cur = self.conn.cursor()
-        
         #configuracao_para_python = eval(self.experimento.configuracao)
         #print(sql, parametros)
         
+        cur = self.conn.cursor()
         cur.execute(sql, parametros)
-        cur.close()
         self.conn.commit()
+        cur.close()
+        
         
 
 def main():
@@ -743,18 +770,23 @@ def main():
     
     classifyDocuments.conn = conexao.conn
     
-    #lista = ['opiniao', 'saude', 'educacao', 'seguranca']
-    lista = ['opiniao']
+    lista = ['opiniao', 'saude', 'educacao', 'seguranca']
+    #lista = ['opiniao']
+    classifyDocuments.obterUltimoLote()
     for item in lista:
         classifyDocuments.aplicar_classificador(item)
-        
-    conexao.desconectar()
     
+
     print("Início do script")
     print(classifyDocuments.inicio)
     print("Fim do script")
     classifyDocuments.fim = strftime("%Y-%m-%d %H:%M:%S", gmtime())
     print(classifyDocuments.fim)
+    
+    classifyDocuments.atualizarExperimentosEmLote()
+    conexao.desconectar()
+    
+    
     
     
 if __name__ == "__main__":
