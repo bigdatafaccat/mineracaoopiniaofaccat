@@ -386,7 +386,7 @@ class ClassifyDocuments(object):
         
         dataset = pd.DataFrame(cur.fetchall(), columns=['texto', 'variavel_dependente'])
         
-        self.cur.close()
+        cur.close()
         return dataset
         
     
@@ -654,8 +654,8 @@ class ClassifyDocuments(object):
         gc.collect()
         self.classificar_com_pipeline(dataset, self.obter_classificador_xgboost())
         gc.collect()
-        self.classificar_com_pipeline(dataset, self.obter_classificador_MLP())
-        gc.collect()
+        #self.classificar_com_pipeline(dataset, self.obter_classificador_MLP())
+        #gc.collect()
         
         #Trabalhos futuros
         #Implementar RNN com LSTM
