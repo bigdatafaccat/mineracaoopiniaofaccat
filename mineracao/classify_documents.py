@@ -55,6 +55,7 @@ class Experimento(object):
 class ClassifyDocuments(object):
     
     conn = None
+    conexao = None
     cur = None
     lote = 0
     inicio = None
@@ -278,6 +279,9 @@ class ClassifyDocuments(object):
     
     
     def classificar_com_pipeline(self, dataset, propriedades_classificador):
+        print(self.experimento.algoritmo.upper())
+        print(self.oqueclassifica.upper())
+        
         classificador, parametros, pipeline = propriedades_classificador
         self.experimento.oqueclassifica = self.oqueclassifica
         
@@ -354,13 +358,9 @@ class ClassifyDocuments(object):
     def get_dataset_opinioes(self):
         # Importing the dataset
         #dataset = pd.read_csv('Restaurant_Reviews.tsv', delimiter = '\t', quoting = 3)
-        cur = self.conn.cursor()
         sql = "select s.texto, case when d.variavel_dependente = 'positiva' then 1 else 0 end as variavel_dependente from documento_para_treino d inner join sentenca s using (idsentenca) where d.variavel_dependente in ('positiva', 'negativa')"
-        cur.execute(sql)
-        
-        dataset = pd.DataFrame(cur.fetchall(), columns=['texto', 'variavel_dependente'])
-        
-        cur.close()
+        registros = self.conexao.obter(sql)
+        dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente'])
         return dataset
     
     
@@ -368,7 +368,6 @@ class ClassifyDocuments(object):
         # Importing the dataset
         #dataset = pd.read_csv('Restaurant_Reviews.tsv', delimiter = '\t', quoting = 3)
         
-        cur = self.conn.cursor()
         sql = """
           select case 
                   when s.tipo_texto = 'post' then s.post_texto
@@ -382,11 +381,9 @@ class ClassifyDocuments(object):
            from documento_para_treino d 
          inner join sentenca s using (idsentenca)
           where d.tipo in ('assunto')"""
-        cur.execute(sql)
         
-        dataset = pd.DataFrame(cur.fetchall(), columns=['texto', 'variavel_dependente'])
-        
-        cur.close()
+        registros = self.conexao.obter(sql)
+        dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente'])
         return dataset
         
     
@@ -644,16 +641,16 @@ class ClassifyDocuments(object):
         #xgboost(X_train, y_train, X_test, y_test)
         
         
-        self.classificar_com_pipeline(dataset, self.obter_classificador_svm())
-        gc.collect()
+        #self.classificar_com_pipeline(dataset, self.obter_classificador_svm())
+        #gc.collect()
         self.classificar_com_pipeline(dataset, self.obter_classificador_naive())
         gc.collect()
         self.classificar_com_pipeline(dataset, self.obter_classificador_random_tree())
         gc.collect()
-        self.classificar_com_pipeline(dataset, self.obter_classificador_SDG())
-        gc.collect()
-        self.classificar_com_pipeline(dataset, self.obter_classificador_xgboost())
-        gc.collect()
+        #self.classificar_com_pipeline(dataset, self.obter_classificador_SDG())
+        #gc.collect()
+        #self.classificar_com_pipeline(dataset, self.obter_classificador_xgboost())
+        #gc.collect()
         #self.classificar_com_pipeline(dataset, self.obter_classificador_MLP())
         #gc.collect()
         
@@ -671,19 +668,13 @@ class ClassifyDocuments(object):
         
     def obterUltimoLote(self):
         sql = "select (coalesce(max(lote_numero), 0) + 1) as lote from experimentos_avaliacao_resultado"
-        cur = self.conn.cursor()
-        cur.execute(sql)
-        registro = cur.fetchall()
-        cur.close()
+        registro = self.conexao.obter(sql)
         self.lote = registro[0][0]
         
     def atualizarExperimentosEmLote(self):
         sql = "update experimentos_avaliacao_resultado set lote_fim = %s where lote_numero = %s"
         parametros = (self.fim, self.lote)
-        cur = self.conn.cursor()
-        cur.execute(sql, parametros)
-        self.conn.commit()
-        cur.close()
+        self.conexao.executar(sql, parametros)
         
         
     def registrarExperimento(self):
@@ -749,10 +740,8 @@ class ClassifyDocuments(object):
         #configuracao_para_python = eval(self.experimento.configuracao)
         #print(sql, parametros)
         
-        cur = self.conn.cursor()
-        cur.execute(sql, parametros)
-        self.conn.commit()
-        cur.close()
+        
+        self.conexao.executar(sql, parametros)
         
         
 
@@ -765,10 +754,7 @@ def main():
 
     sys.path.append(os.path.abspath("../"))
     from conexao import Conexao
-    conexao = Conexao()
-    conexao.conectar()
-    
-    classifyDocuments.conn = conexao.conn
+    classifyDocuments.conexao = Conexao()
     
     lista = ['opiniao', 'saude', 'educacao', 'seguranca']
     #lista = ['opiniao']
@@ -784,7 +770,6 @@ def main():
     print(classifyDocuments.fim)
     
     classifyDocuments.atualizarExperimentosEmLote()
-    conexao.desconectar()
     
     
     

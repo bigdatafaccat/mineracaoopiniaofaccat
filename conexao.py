@@ -12,11 +12,42 @@ class Conexao(object):
         
         try:
             self.conn = psycopg2.connect(string_conexao)
-            print ("Conexao estabelecida")
+            #print ("Conexao estabelecida")
         
         except:
             print("I am unable to connect to the database")
             
     def desconectar(self):
         self.conn.close()
+        
+    def executar(self, sql, parametros=None):
+        self.conectar()
+        cur = self.conn.cursor()
+        
+        if (parametros == None):
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parametros)
+        
+        self.conn.commit()
+        cur.close()
+        self.desconectar()
+        
+    
+    def obter(self, sql, parametros=None):
+        self.conectar()
+        cur = self.conn.cursor()
+        
+        if (parametros == None):
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parametros)
+        
+        retorno = cur.fetchall()
+        
+        self.conn.commit()
+        cur.close()
+        self.desconectar()
+        
+        return retorno
         

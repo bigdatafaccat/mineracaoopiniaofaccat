@@ -27,6 +27,26 @@ def analisar_anotacao_de_opiniao():
             cur.execute("insert into documento_para_treino (idsentenca, tipo, variavel_dependente) values ("+str(idsentenca)+", 'opiniao', '"+str(moda)+"')")
         
 
+def analisar_anotacao_de_vale_paranhana():
+    cur.execute("select idsentenca, count(*) as anotacoes, count(distinct(coalesce(vale_paranhana, false))) as opinioes_diferentes, mode() WITHIN GROUP (ORDER BY coalesce(vale_paranhana, false)) AS moda from anotacao group by 1 order by 1")
+    result = cur.fetchall()
+    for registro in result:
+        idsentenca = registro[0]
+        anotacoes = registro[1]
+        anotacoes_diferentes = registro[2]
+        moda = registro[3] #valor que mais se repete
+        
+        if (anotacoes >= 2 and (((anotacoes - anotacoes_diferentes) == 0))):
+            #precisa reanotar
+            cur.execute("insert into anotacao_divergente (idsentenca, tipo) values ("+str(idsentenca)+", 'vale_paranhana')")
+            
+            
+        elif (anotacoes >= 2 and ((anotacoes - anotacoes_diferentes) > 0)):
+            #entao pode considerar sentenca para treino
+            cur.execute("insert into documento_para_treino (idsentenca, tipo, variavel_dependente) values ("+str(idsentenca)+", 'vale_paranhana', '"+str(moda)+"')")
+
+
+
 def analisar_anotacao_de_assuntos():
     assuntos = ['saude', 'educacao', 'seguranca']
     for assunto in assuntos:
@@ -76,6 +96,7 @@ if __name__ == '__main__':
         
     analisar_anotacao_de_opiniao()
     analisar_anotacao_de_assuntos()
+    analisar_anotacao_de_vale_paranhana()
           
         
              
