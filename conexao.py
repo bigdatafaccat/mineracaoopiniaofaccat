@@ -12,7 +12,7 @@ class Conexao(object):
         
         try:
             self.conn = psycopg2.connect(string_conexao)
-            print ("Conexão estabelecida")
+            print ("Conexao estabelecida")
         
         except:
             print("I am unable to connect to the database")
