@@ -357,8 +357,23 @@ class ClassifyDocuments(object):
     
     def get_dataset_opinioes(self):
         # Importing the dataset
-        #dataset = pd.read_csv('Restaurant_Reviews.tsv', delimiter = '\t', quoting = 3)
         sql = "select s.texto, case when d.variavel_dependente = 'positiva' then 1 else 0 end as variavel_dependente from documento_para_treino d inner join sentenca s using (idsentenca) where d.variavel_dependente in ('positiva', 'negativa')"
+        registros = self.conexao.obter(sql)
+        dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente'])
+        return dataset
+    
+    def get_dataset_vale_paranhana(self):
+        # Importing the dataset
+        sql = """
+            select case 
+                      when s.tipo_texto = 'post' then s.post_texto
+                      when s.tipo_texto = 'comentario' then s.post_texto || s.comentario_texto
+                      when s.tipo_texto = 'comentario_de_comentario' then s.post_texto || s.comentario_texto
+                    end as texto, 
+                   case when d.variavel_dependente = 'True' then 1 else 0 end as variavel_dependente 
+              from documento_para_treino d 
+        inner join sentenca s using (idsentenca)
+             where d.tipo = 'vale_paranhana'"""
         registros = self.conexao.obter(sql)
         dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente'])
         return dataset
@@ -603,6 +618,8 @@ class ClassifyDocuments(object):
     def aplicar_classificador(self, alvo):
         if (alvo == 'opiniao'):
             dataset = self.get_dataset_opinioes()
+        elif (alvo == 'vale_paranhana'):
+            dataset = self.get_dataset_vale_paranhana()
         else:
             dataset = self.get_dataset_assunto(alvo)
         
@@ -641,18 +658,18 @@ class ClassifyDocuments(object):
         #xgboost(X_train, y_train, X_test, y_test)
         
         
-        #self.classificar_com_pipeline(dataset, self.obter_classificador_svm())
-        #gc.collect()
-        #self.classificar_com_pipeline(dataset, self.obter_classificador_naive())
-        #gc.collect()
-        #self.classificar_com_pipeline(dataset, self.obter_classificador_random_tree())
-        #gc.collect()
-        #self.classificar_com_pipeline(dataset, self.obter_classificador_SDG())
-        #gc.collect()
-        #self.classificar_com_pipeline(dataset, self.obter_classificador_xgboost())
-        #gc.collect()
-        self.classificar_com_pipeline(dataset, self.obter_classificador_MLP())
+        self.classificar_com_pipeline(dataset, self.obter_classificador_svm())
         gc.collect()
+        self.classificar_com_pipeline(dataset, self.obter_classificador_naive())
+        gc.collect()
+        self.classificar_com_pipeline(dataset, self.obter_classificador_random_tree())
+        gc.collect()
+        self.classificar_com_pipeline(dataset, self.obter_classificador_SDG())
+        gc.collect()
+        self.classificar_com_pipeline(dataset, self.obter_classificador_xgboost())
+        gc.collect()
+        #self.classificar_com_pipeline(dataset, self.obter_classificador_MLP())
+        #gc.collect()
         
         #Trabalhos futuros
         #Implementar RNN com LSTM
@@ -756,7 +773,7 @@ def main():
     from conexao import Conexao
     classifyDocuments.conexao = Conexao()
     
-    lista = ['opiniao', 'saude', 'educacao', 'seguranca']
+    lista = ['opiniao', 'saude', 'educacao', 'seguranca', 'vale_paranhana']
     #lista = ['opiniao']
     classifyDocuments.obterUltimoLote()
     for item in lista:
