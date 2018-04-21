@@ -643,16 +643,16 @@ class ClassifyDocuments(object):
         
         #self.classificar_com_pipeline(dataset, self.obter_classificador_svm())
         #gc.collect()
-        self.classificar_com_pipeline(dataset, self.obter_classificador_naive())
-        gc.collect()
-        self.classificar_com_pipeline(dataset, self.obter_classificador_random_tree())
-        gc.collect()
+        #self.classificar_com_pipeline(dataset, self.obter_classificador_naive())
+        #gc.collect()
+        #self.classificar_com_pipeline(dataset, self.obter_classificador_random_tree())
+        #gc.collect()
         #self.classificar_com_pipeline(dataset, self.obter_classificador_SDG())
         #gc.collect()
         #self.classificar_com_pipeline(dataset, self.obter_classificador_xgboost())
         #gc.collect()
-        #self.classificar_com_pipeline(dataset, self.obter_classificador_MLP())
-        #gc.collect()
+        self.classificar_com_pipeline(dataset, self.obter_classificador_MLP())
+        gc.collect()
         
         #Trabalhos futuros
         #Implementar RNN com LSTM
