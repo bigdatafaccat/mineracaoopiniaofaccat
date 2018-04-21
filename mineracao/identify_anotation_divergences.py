@@ -52,7 +52,7 @@ def analisar_anotacao_de_assunto(assunto):
             cur.execute("insert into anotacao_divergente (idsentenca, tipo) values ("+str(idsentenca)+", 'assunto')")
             
         elif (anotacoes >= 2 and ((anotacoes - anotacoes_diferentes) > 0) and moda):
-            #então pode considerar sentenca para treino
+            #entao pode considerar sentenca para treino
             cur.execute("insert into documento_para_treino (idsentenca, tipo, variavel_dependente) values ("+str(idsentenca)+", 'assunto', '"+str(menciona_assunto)+"')")
             
             
