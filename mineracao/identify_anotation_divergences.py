@@ -23,7 +23,7 @@ def analisar_anotacao_de_opiniao():
             
             
         elif (anotacoes >= 2 and ((anotacoes - anotacoes_diferentes) > 0)):
-            #então pode considerar sentenca para treino
+            #entao pode considerar sentenca para treino
             cur.execute("insert into documento_para_treino (idsentenca, tipo, variavel_dependente) values ("+str(idsentenca)+", 'opiniao', '"+str(moda)+"')")
         
 
