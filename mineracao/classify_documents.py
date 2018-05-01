@@ -62,6 +62,10 @@ class ClassifyDocuments(object):
     fim = None
     experimento = None
     oqueclassifica = None
+    n_cross_validation = 2
+    verbose=0
+    flag_classificar_documentos=True
+    limite_dados=30
     
     
     
@@ -278,60 +282,11 @@ class ClassifyDocuments(object):
         return y_pred
     
     
-    def classificar_com_pipeline(self, dataset, propriedades_classificador):
-        print(self.experimento.algoritmo.upper())
-        print(self.oqueclassifica.upper())
-        
-        classificador, parametros, pipeline = propriedades_classificador
-        self.experimento.oqueclassifica = self.oqueclassifica
-        
-        parametros_comuns = {
-            'vect__ngram_range': [(1, 1), (1, 2), (1, 3), (1, 4)],
-            'vect__max_features': (None, 1000, 10000, 100000, 200000),
-            'tfidf__use_idf': (True, False)
-        }
-        parametros_mesclados = self.mesclar_parametros(parametros_comuns, parametros)
-        
-        X_train, X_test, y_train, y_test = self.obter_treino_teste(dataset)
-        
-        #pipeline = Pipeline(
-        #        [
-        #                ('vect', CountVectorizer()),
-        #                ('tfidf', TfidfTransformer()),
-        #                ('clf', classificador)
-        #        ],
-        #)
-        
-        
-        pipeline.fit(X_train, y_train)  
-        clf = GridSearchCV(pipeline, parametros_mesclados, n_jobs=-1, cv=10)
-        clf.fit(X_train, y_train)
-        
-        #apresenta os parametros que geraram os melhores resultados
-        print("Melhor resultado: %s" % clf.best_score_)
-        print("Melhores parametros: %s" % clf.best_params_)
-        
-        melhor_classificador = clf.best_estimator_
-        melhor_classificador.fit(X_train, y_train)
-        y_pred = melhor_classificador.predict(X_test)
-        self.avaliar(y_test, y_pred)
-        
-        
-        self.experimento.melhor_classificador = clf.best_estimator_
-        self.experimento.configuracao = clf.best_params_
-        self.experimento.acuracia_cross_validation = clf.best_score_
-        self.experimento.fim = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-        
-        self.registrarExperimento()
-        
-        return y_pred
-    
-    
     def cross_fold(self, X_train, y_train, X_test, classifier):
         from sklearn.model_selection import cross_val_score, cross_validate
-        acuracia = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
+        acuracia = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = self.n_cross_validation)
         
-        resultado = cross_validate(estimator = classifier, X = X_train, y = y_train, cv = 10)
+        resultado = cross_validate(estimator = classifier, X = X_train, y = y_train, cv = self.n_cross_validation)
         #TODO: apresentar resultados do cross fold validation no mesmo formato do metrics.classification_report(y_test, y_pred)
         #print(resultado) #isso aqui não funciona
         
@@ -355,11 +310,108 @@ class ClassifyDocuments(object):
         print (resultado)
         print ("Acurácia: %s" % acuracia)
     
+    
+    def get_dataset_para_classificar(self):
+        if (self.experimento.oqueclassifica == 'opiniao' or self.experimento.oqueclassifica == 'com_sem_opiniao'):
+            sql = """
+                select post_id,
+                       comentario_id,
+                       comentario_comentario_id,
+                       sentenca_id,
+                       texto,
+                       tipo_texto
+                  from sentenca
+              group by 1,2,3,4,5,6
+            """
+        elif (self.experimento.oqueclassifica == 'vale_paranhana' or 
+              self.experimento.oqueclassifica == 'saude' or
+              self.experimento.oqueclassifica == 'educacao' or
+              self.experimento.oqueclassifica == 'seguranca'):
+            sql = """
+                select post_id,
+                       '' as comentario_id,
+                       '' as comentario_comentario_id,
+                       '' as sentenca_id,
+                       s.post_texto as texto,
+                       tipo_texto
+                  from sentenca
+                 where tipo_texto = 'post'
+              group by 1,2,3,4,5,6
+              
+                 union
+              
+                select post_id,
+                       comentario_id,
+                       '' as comentario_comentario_id,
+                       '' as sentenca_id,
+                       s.post_texto || s.comentario_texto as texto,
+                       tipo_texto
+                  from sentenca
+                 where tipo_texto = 'comentario'
+              group by 1,2,3,4,5,6
+              
+                 union
+            
+                select post_id,
+                       comentario_id,
+                       comentario_comentario_id,
+                       '' as sentenca_id,
+                       s.post_texto || s.comentario_comentario_texto as texto,
+                       tipo_texto
+                  from sentenca
+                 where tipo_texto = 'comentario_de_comentario'
+              group by 1,2,3,4,5,6            
+            """
+        else:
+            print("ERRRROOOOUUU")
+            sys.exit(0)
+            
+        if (self.limite_dados != None):
+            sql = sql + " limit " + str(self.limite_dados)
+            
+        registros = self.conexao.obter(sql)
+        dataset = pd.DataFrame(registros, columns=['post_id', 'comentario_id', 'comentario_comentario_id', 'sentenca_id', 'texto', 'tipo_texto'])
+        
+        return dataset
+    
+    def get_dataset_com_sem_opinioes(self):
+        # Importing the dataset
+        sql = """
+            select s.texto, 
+              case 
+                when d.variavel_dependente = 'positiva' or variavel_dependente = 'negativa' then 1 
+                else 0 
+              end as variavel_dependente,
+              s.sentenca_id as chave
+              from documento_para_treino d 
+        inner join sentenca s using (idsentenca) 
+             where d.variavel_dependente in ('positiva', 'negativa', 'nenhuma')
+               and d.tipo = 'opiniao'
+             group by 1,2,3"""
+        if (self.limite_dados != None):
+            sql = sql + " limit " + str(self.limite_dados)
+        registros = self.conexao.obter(sql)
+        dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente', 'chave'])
+        return dataset
+    
     def get_dataset_opinioes(self):
         # Importing the dataset
-        sql = "select s.texto, case when d.variavel_dependente = 'positiva' then 1 else 0 end as variavel_dependente from documento_para_treino d inner join sentenca s using (idsentenca) where d.variavel_dependente in ('positiva', 'negativa')"
+        sql = """
+            select s.texto, 
+              case 
+                when d.variavel_dependente = 'positiva' then 1 
+                else 0 
+              end as variavel_dependente,
+              s.sentenca_id as chave
+              from documento_para_treino d 
+        inner join sentenca s using (idsentenca) 
+             where d.variavel_dependente in ('positiva', 'negativa')
+               and d.tipo = 'opiniao'
+             group by 1,2,3"""
+        if (self.limite_dados != None):
+            sql = sql + " limit " + str(self.limite_dados)
         registros = self.conexao.obter(sql)
-        dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente'])
+        dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente', 'chave'])
         return dataset
     
     def get_dataset_vale_paranhana(self):
@@ -367,15 +419,24 @@ class ClassifyDocuments(object):
         sql = """
             select case 
                       when s.tipo_texto = 'post' then s.post_texto
-                      when s.tipo_texto = 'comentario' then s.post_texto || s.comentario_texto
-                      when s.tipo_texto = 'comentario_de_comentario' then s.post_texto || s.comentario_texto
+                      when s.tipo_texto = 'comentario' then s.post_texto || '. ' || s.comentario_texto
+                      when s.tipo_texto = 'comentario_de_comentario' then s.post_texto || '. ' || s.comentario_comentario_texto
                     end as texto, 
-                   case when d.variavel_dependente = 'True' then 1 else 0 end as variavel_dependente 
+                   case when d.variavel_dependente = 'True' then 1 else 0 end as variavel_dependente,
+                   s.tipo_texto,
+                   case 
+                      when s.tipo_texto = 'post' then s.post_id
+                      when s.tipo_texto = 'comentario' then s.post_id || '_' || s.comentario_id
+                      when s.tipo_texto = 'comentario_de_comentario' then s.post_id || '_' || s.comentario_comentario_id
+                    end as chave
               from documento_para_treino d 
         inner join sentenca s using (idsentenca)
-             where d.tipo = 'vale_paranhana'"""
+             where d.tipo = 'vale_paranhana'
+             group by 1,2,3,4"""
+        if (self.limite_dados != None):
+            sql = sql + " limit " + str(self.limite_dados)
         registros = self.conexao.obter(sql)
-        dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente'])
+        dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente', 'tipo_texto', 'chave'])
         return dataset
     
     
@@ -387,18 +448,26 @@ class ClassifyDocuments(object):
           select case 
                   when s.tipo_texto = 'post' then s.post_texto
                   when s.tipo_texto = 'comentario' then s.post_texto || s.comentario_texto
-                  when s.tipo_texto = 'comentario_de_comentario' then s.post_texto || s.comentario_texto
+                  when s.tipo_texto = 'comentario_de_comentario' then s.post_texto || s.comentario_comentario_texto
                 end as texto, 
                 case 
                   when d.variavel_dependente = '"""+assunto+"""' then 1 
                   else 0 
-                end as variavel_dependente 
+                end as variavel_dependente,
+                s.tipo_texto,
+                   case 
+                      when s.tipo_texto = 'post' then s.post_id
+                      when s.tipo_texto = 'comentario' then s.post_id || '_' || s.comentario_id
+                      when s.tipo_texto = 'comentario_de_comentario' then s.post_id || s.comentario_comentario_id
+                    end as chave
            from documento_para_treino d 
          inner join sentenca s using (idsentenca)
-          where d.tipo in ('assunto')"""
-        
+          where d.tipo in ('assunto')
+          group by 1,2,3,4"""
+        if (self.limite_dados != None):
+            sql = sql + " limit " + str(self.limite_dados)
         registros = self.conexao.obter(sql)
-        dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente'])
+        dataset = pd.DataFrame(registros, columns=['texto', 'variavel_dependente', 'tipo_texto', 'chave'])
         return dataset
         
     
@@ -444,10 +513,11 @@ class ClassifyDocuments(object):
         self.experimento.algoritmo = "SVM"
         self.experimento.inicio = strftime("%Y-%m-%d %H:%M:%S", gmtime())
         
-        parametros = {'clf__kernel': ['linear', 'rbf', 'poly'],
-                      'clf__C': [1,10],
-                      'clf__gamma': [0.001, 0.0001],
-                      'clf__cache_size': (100, 200, 300, 400)
+        parametros = {'clf__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
+                      'clf__C': [0.001, 0.01, 1, 10, 100],
+                      'clf__gamma': [1, 10, 100, 0.1, 0.01, 0.001, 0.0001, 'auto'],
+                      'clf__cache_size': [100],
+                      'clf__degree': [1,2,3,4,5,7,8,9,10]
         }
         
         from sklearn.svm import SVC
@@ -613,11 +683,100 @@ class ClassifyDocuments(object):
         
         return [classificador, parametros, pipeline]
     
+    def classificar_com_pipeline(self, dataset, propriedades_classificador):
+        print(self.experimento.algoritmo.upper())
+        print(self.oqueclassifica.upper())
+        
+        classificador, parametros, pipeline = propriedades_classificador
+        self.experimento.oqueclassifica = self.oqueclassifica
+        
+        parametros_comuns = {
+            'vect__ngram_range': [(1, 1), (1, 2), (1, 3), (1, 4)],
+            'vect__max_features': (None, 1000, 10000, 100000, 200000),
+            'tfidf__use_idf': (True, False)
+        }
+        parametros_mesclados = self.mesclar_parametros(parametros_comuns, parametros)
+        
+        X_train, X_test, y_train, y_test = self.obter_treino_teste(dataset)
+        
+        pipeline.fit(X_train, y_train)  
+        clf = GridSearchCV(pipeline, parametros_mesclados, n_jobs=-1, cv=self.n_cross_validation, verbose=self.verbose)
+        clf.fit(X_train, y_train)
+        
+        #apresenta os parametros que geraram os melhores resultados
+        print("Melhor resultado: %s" % clf.best_score_)
+        print("Melhores parametros: %s" % clf.best_params_)
+        
+        melhor_classificador = clf.best_estimator_
+        melhor_classificador.fit(X_train, y_train)
+        y_pred = melhor_classificador.predict(X_test)
+        self.avaliar(y_test, y_pred)
+        
+        
+        self.experimento.melhor_classificador = clf.best_estimator_
+        self.experimento.configuracao = clf.best_params_
+        self.experimento.acuracia_cross_validation = clf.best_score_
+        self.experimento.fim = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        
+        idexperimento = self.registrarExperimento()
+        if (self.flag_classificar_documentos):
+            self.classificar_documentos(idexperimento, clf.best_estimator_, X_train, y_train)
+        
+        return y_pred
+    
+    def classificar_documentos(self, idexperimento, classificador, X_train, y_train):
+        dataset = self.get_dataset_para_classificar()
+        corpus = self.prepare_corpus(dataset)
+        X_test = corpus
+        classificador.fit(X_train, y_train)
+        y_pred = classificador.predict(X_test)
+        
+        for indice in range(0, len(dataset)):
+            string = "sentenca_id %s previsto %s" % (str(dataset['sentenca_id'][indice]), str(y_pred[indice]))
+            print(string)
+            
+            sql = """
+            insert into documento_classificado 
+            (idexperimentos_avaliacao_resultado, 
+            sentenca_id, 
+            post_id,
+            comentario_id,
+            comentario_comentario_id,
+            texto,
+            tipo_texto,
+            oqueclassifica,
+            variavel_dependente)
+            values (
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s)"""
+            parametros = (
+                str(idexperimento),
+                str(dataset['sentenca_id'][indice]),
+                str(dataset['post_id'][indice]),
+                str(dataset['comentario_id'][indice]),
+                str(dataset['comentario_comentario_id'][indice]),
+                str(dataset['texto'][indice]),            
+                str(dataset['tipo_texto'][indice]),
+                str(self.experimento.oqueclassifica),
+                str(y_pred[indice])   
+            )
+            self.conexao.executar(sql, parametros)
+        
+        
     
     
     def aplicar_classificador(self, alvo):
         if (alvo == 'opiniao'):
             dataset = self.get_dataset_opinioes()
+        elif (alvo == 'com_sem_opiniao'):
+            dataset = self.get_dataset_com_sem_opinioes()
         elif (alvo == 'vale_paranhana'):
             dataset = self.get_dataset_vale_paranhana()
         else:
@@ -658,12 +817,12 @@ class ClassifyDocuments(object):
         #xgboost(X_train, y_train, X_test, y_test)
         
         
-        self.classificar_com_pipeline(dataset, self.obter_classificador_svm())
-        gc.collect()
-        self.classificar_com_pipeline(dataset, self.obter_classificador_naive())
-        gc.collect()
-        self.classificar_com_pipeline(dataset, self.obter_classificador_random_tree())
-        gc.collect()
+        #self.classificar_com_pipeline(dataset, self.obter_classificador_svm())
+        #gc.collect()
+        #self.classificar_com_pipeline(dataset, self.obter_classificador_naive())
+        #gc.collect()
+        #self.classificar_com_pipeline(dataset, self.obter_classificador_random_tree())
+        #gc.collect()
         self.classificar_com_pipeline(dataset, self.obter_classificador_SDG())
         gc.collect()
         self.classificar_com_pipeline(dataset, self.obter_classificador_xgboost())
@@ -697,8 +856,15 @@ class ClassifyDocuments(object):
     def registrarExperimento(self):
         
         sql = """
+        select nextval('experimentos_avaliacao_result_idexperimentos_avaliacao_resu_seq')
+        """
+        registro = self.conexao.obter(sql)
+        idexperimento = registro[0][0]
+        
+        sql = """
         insert into experimentos_avaliacao_resultado 
-        ( 
+        (
+        idexperimentos_avaliacao_resultado,
         algoritmo,
         descricao,
         oqueclassifica,
@@ -731,12 +897,14 @@ class ClassifyDocuments(object):
         %s,
         %s,
         %s,
+        %s,
         %s
         )
         
         
         """
         parametros = (
+            str(idexperimento),
             str(self.experimento.algoritmo),
             str(self.experimento.descricao),
             str(self.experimento.oqueclassifica),
@@ -759,6 +927,7 @@ class ClassifyDocuments(object):
         
         
         self.conexao.executar(sql, parametros)
+        return idexperimento
         
         
 
@@ -773,7 +942,8 @@ def main():
     from conexao import Conexao
     classifyDocuments.conexao = Conexao()
     
-    lista = ['opiniao', 'saude', 'educacao', 'seguranca', 'vale_paranhana']
+    #lista = ['opiniao', 'com_sem_opiniao', 'saude', 'educacao', 'seguranca', 'vale_paranhana']
+    lista = ['opiniao']
     #lista = ['opiniao']
     classifyDocuments.obterUltimoLote()
     for item in lista:
