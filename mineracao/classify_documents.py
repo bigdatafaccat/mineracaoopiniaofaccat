@@ -63,8 +63,8 @@ class ClassifyDocuments(object):
     fim = None
     experimento = None
     oqueclassifica = None
-    n_cross_validation = 2
-    verbose=0
+    n_cross_validation = 10
+    verbose=3
     flag_classificar_documentos=True
     limite_dados=None
     #classificadores = ['svm', 'naive', 'random_tree', 'SDG', 'xgboost', 'MLP']
