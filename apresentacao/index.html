@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="utf-8">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Apresentação de dados">
+  <meta name="author" content="Rodrigo Weber">
+
+  <title>Faccat</title>
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/modern-business.css" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">Projeto de Pesquisa sobre Mineração de Opiniões - Faccat</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="my-4">Apresentação dos resultados</h1>
+
+    <div id="wrapper" class="row">
+    </div>
+  </div>
+
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const data = [
+      {
+        topico: "Saúde", positivo: '70%', negativo: '30%',
+        palavras: ['Posto', 'Médico', 'Enfermeiro']
+      },
+      {
+        topico: "Segurança", positivo: '60%', negativo: '40%',
+        palavras: ['Policial', 'Delegacia', 'Bandido']
+      },
+      {
+        topico: "Educação", positivo: '50%', negativo: '50%',
+        palavras: ['Professor', 'Aluno', 'Sala de aula']
+      },
+    ];
+
+    $.each(data, function (index, value) {
+      const template =
+        `<div class="col-lg-4 mb-4">
+          <div class="card h-100">
+            <h4 class="card-header">${value.topico}</h4>
+            <div class="card-body">
+              <p class="card-text">Positivo: ${value.positivo}</p>
+              <p class="card-text">Negativo: ${value.negativo}</p>
+              <h5 class="my-3">Palavras</h5>
+              <ul id="${value.topico}">
+              </ul>
+            </div>
+            <div class="card-footer">
+              <a href="#" class="btn btn-primary">Learn More</a>
+            </div>
+          </div>
+         </div>`;
+
+      $('#wrapper').append(template);
+
+      $.each(value.palavras, function (_, v) {
+        $(`#${value.topico}`).append(`<li>${v}</li>`);
+      });
+    });
+  </script>
+</body>
+
+</html>
