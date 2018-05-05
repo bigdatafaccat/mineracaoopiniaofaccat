@@ -69,6 +69,7 @@ class ClassifyDocuments(object):
     limite_dados=None
     #classificadores = ['svm', 'naive', 'random_tree', 'SDG', 'xgboost', 'MLP']
     classificadores = ['svm', 'naive', 'random_tree', 'SDG', 'xgboost']
+    #classificadores = ['svm']
     
     
     
@@ -741,10 +742,12 @@ class ClassifyDocuments(object):
         dataset = self.get_dataset_para_classificar()
         corpus = self.prepare_corpus(dataset)
         X_test = corpus
+        print("Momento de treino "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
         classificador.fit(X_train, y_train)
+        print("Momento de classificação "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
         y_pred = classificador.predict(X_test)
         
-        print("Classificando documentos "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+        print("Registrando classificação no banco "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
         for indice in range(0, len(dataset)):
             #string = "sentenca_id %s previsto %s" % (str(dataset['sentenca_id'][indice]), str(y_pred[indice]))
             #print(string)
@@ -810,7 +813,9 @@ class ClassifyDocuments(object):
         for classificador in self.classificadores:
             metodo = getattr(self, 'obter_classificador_'+classificador)
             resultado_tmp, X_train, y_train = self.classificar_com_pipeline(dataset, metodo())
-            self.classificar_documentos(self.experimento.idexperimento, self.experimento.melhor_classificador, melhor_X_train, melhor_y_train)
+            self.classificar_documentos(self.experimento.idexperimento, self.experimento.melhor_classificador, X_train, y_train)
+            
+            
             if (resultado_tmp > melhor_resultado):
                 melhor_resultado = resultado_tmp
                 melhor_experimento = self.experimento
@@ -966,8 +971,8 @@ def main():
     classifyDocuments.conexao = Conexao()
     classifyDocuments.preparar_dados_temporarios()
     
-    #lista = ['opiniao', 'com_sem_opiniao', 'saude', 'educacao', 'seguranca', 'vale_paranhana']
-    lista = ['seguranca', 'vale_paranhana']
+    lista = ['opiniao', 'com_sem_opiniao', 'saude', 'educacao', 'seguranca', 'vale_paranhana']
+    #lista = ['opiniao', 'seguranca', 'vale_paranhana']
     #lista = ['saude', 'educacao', 'seguranca', 'vale_paranhana']
     #lista = ['seguranca', 'vale_paranhana']
     #lista = ['opiniao']
