@@ -521,8 +521,9 @@ class ClassifyDocuments(object):
         parametros = {'clf__kernel': ['linear', 'rbf', 'poly', 'sigmoid'],
                       'clf__C': [0.001, 0.01, 1, 10, 100],
                       'clf__gamma': [1, 10, 100, 0.1, 0.01, 0.001, 0.0001, 'auto'],
-                      'clf__cache_size': [100],
-                      'clf__degree': [1,2,3,4,5,7,8,9,10]
+                      'clf__cache_size': [300],
+                      #'clf__degree': [1,2,3,4,5,7,8,9,10]
+                      'clf__degree': [1,2,3,4,5,7]
         }
         """parametros = {'clf__kernel': ['linear'],
                       'clf__C': [0.001],
@@ -809,6 +810,7 @@ class ClassifyDocuments(object):
         for classificador in self.classificadores:
             metodo = getattr(self, 'obter_classificador_'+classificador)
             resultado_tmp, X_train, y_train = self.classificar_com_pipeline(dataset, metodo())
+            self.classificar_documentos(self.experimento.idexperimento, self.experimento.melhor_classificador, melhor_X_train, melhor_y_train)
             if (resultado_tmp > melhor_resultado):
                 melhor_resultado = resultado_tmp
                 melhor_experimento = self.experimento
@@ -818,10 +820,9 @@ class ClassifyDocuments(object):
                 
             
         
-        print("Classificaria com o "+melhor_experimento.algoritmo)
-        if (self.flag_classificar_documentos):
-            
-            self.classificar_documentos(melhor_experimento.idexperimento, melhor_experimento.melhor_classificador, melhor_X_train, melhor_y_train)
+        #print("Classificaria com o "+melhor_experimento.algoritmo)
+        #if (self.flag_classificar_documentos):
+            #self.classificar_documentos(melhor_experimento.idexperimento, melhor_experimento.melhor_classificador, melhor_X_train, melhor_y_train)
         
         gc.collect()
         
@@ -965,7 +966,8 @@ def main():
     classifyDocuments.conexao = Conexao()
     classifyDocuments.preparar_dados_temporarios()
     
-    lista = ['opiniao', 'com_sem_opiniao', 'saude', 'educacao', 'seguranca', 'vale_paranhana']
+    #lista = ['opiniao', 'com_sem_opiniao', 'saude', 'educacao', 'seguranca', 'vale_paranhana']
+    lista = ['seguranca', 'vale_paranhana']
     #lista = ['saude', 'educacao', 'seguranca', 'vale_paranhana']
     #lista = ['seguranca', 'vale_paranhana']
     #lista = ['opiniao']
