@@ -10,6 +10,11 @@
   <title>Faccat</title>
   <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="css/modern-business.css" rel="stylesheet">
+
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="js/d3.min.js"></script>
+  <script src="js/cloud.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
@@ -28,25 +33,53 @@
 
     <div id="wrapper" class="row">
     </div>
+    <div id="vis">
+    </div>
   </div>
 
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
     const data = [
       {
-        topico: "Saúde", positivo: '70%', negativo: '30%',
-        palavras: ['Posto', 'Médico', 'Enfermeiro']
+        topico: "Saúde", 
+        quantidadePosts: 1500, 
+        quantidadePositivo: 1000, 
+        porcentagemPositivo: '70%', 
+        quantidadeNegativo: 500,
+        porcentagemNegativo: '30%',
+        palavras: [
+          { key: "Médico", value: 100 },
+          { key: "Seringa", value: 33 },
+          { key: "Vacina", value: 45 },
+          { key: "Posto", value: 15 },
+          { key: "Enfermeiros", value: 10 },
+          { key: "Remédios", value: 9 }
+        ]
       },
       {
-        topico: "Segurança", positivo: '60%', negativo: '40%',
-        palavras: ['Policial', 'Delegacia', 'Bandido']
+        topico: "Segurança", quantidadePosts: 2000, positivo: '60%', negativo: '40%',
+        palavras: [
+          { key: "Policial", value: 100 },
+          { key: "Delegacia", value: 33 },
+          { key: "Bandido", value: 45 },
+          { key: "Arma", value: 15 },
+          { key: "Assalto", value: 10 },
+          { key: "Presidio", value: 9 }
+        ]
       },
       {
-        topico: "Educação", positivo: '50%', negativo: '50%',
-        palavras: ['Professor', 'Aluno', 'Sala de aula']
+        topico: "Educação", quantidadePosts: 3000, positivo: '50%', negativo: '50%',
+        palavras: [
+          { key: "Professor", value: 100 },
+          { key: "Aluno", value: 33 },
+          { key: "Sala de aula", value: 45 },
+          { key: "Diretoria", value: 15 },
+          { key: "Merenda", value: 10 },
+          { key: "Lápis", value: 9 }
+        ]
       },
     ];
+
+    let dataWords = []
 
     $.each(data, function (index, value) {
       const template =
@@ -54,6 +87,7 @@
           <div class="card h-100">
             <h4 class="card-header">${value.topico}</h4>
             <div class="card-body">
+              <p class="card-text">Quantidade de Posts: ${value.quantidadePosts}</p>
               <p class="card-text">Positivo: ${value.positivo}</p>
               <p class="card-text">Negativo: ${value.negativo}</p>
               <h5 class="my-3">Palavras</h5>
@@ -61,18 +95,27 @@
               </ul>
             </div>
             <div class="card-footer">
-              <a href="#" class="btn btn-primary">Learn More</a>
+              <button id=nuvem-${index} data-id=${index} class="btn btn-primary">Nuvem de palavras</button>
             </div>
           </div>
          </div>`;
 
       $('#wrapper').append(template);
 
+      $(`#nuvem-${index}`).on('click', function () {
+        const id = $(this).data('id');
+
+        dataWords = data[id].palavras;
+        update();
+      });
+
       $.each(value.palavras, function (_, v) {
-        $(`#${value.topico}`).append(`<li>${v}</li>`);
+        $(`#${value.topico}`).append(`<li>${v.key}</li>`);
       });
     });
   </script>
+
+  <script src="js/word-cloud.js"></script>
 </body>
 
 </html>
