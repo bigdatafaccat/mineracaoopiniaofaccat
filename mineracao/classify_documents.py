@@ -69,7 +69,7 @@ class ClassifyDocuments(object):
     limite_dados=None
     #classificadores = ['svm', 'naive', 'random_tree', 'SDG', 'xgboost', 'MLP']
     #classificadores = ['naive', 'random_tree', 'SDG', 'xgboost']
-    classificadores = ['SVM']
+    classificadores = ['svm']
     
     
     
