@@ -68,8 +68,8 @@ class ClassifyDocuments(object):
     flag_classificar_documentos=True
     limite_dados=None
     #classificadores = ['svm', 'naive', 'random_tree', 'SDG', 'xgboost', 'MLP']
-    classificadores = ['svm', 'naive', 'random_tree', 'SDG', 'xgboost']
-    #classificadores = ['svm']
+    #classificadores = ['naive', 'random_tree', 'SDG', 'xgboost']
+    classificadores = ['SDG', 'xgboost']
     
     
     
@@ -350,7 +350,7 @@ class ClassifyDocuments(object):
                        comentario_id,
                        '' as comentario_comentario_id,
                        '' as sentenca_id,
-                       post_texto || '. ' || comentario_texto as texto,
+                       comentario_texto as texto,
                        tipo_texto
                   from sentenca_tmp
                  where tipo_texto = 'comentario'
@@ -362,7 +362,7 @@ class ClassifyDocuments(object):
                        comentario_id,
                        comentario_comentario_id,
                        '' as sentenca_id,
-                       post_texto || '. ' || comentario_comentario_texto as texto,
+                       comentario_comentario_texto as texto,
                        tipo_texto
                   from sentenca_tmp
                  where tipo_texto = 'comentario_de_comentario'
@@ -524,7 +524,7 @@ class ClassifyDocuments(object):
                       'clf__gamma': [1, 10, 100, 0.1, 0.01, 0.001, 0.0001, 'auto'],
                       'clf__cache_size': [300],
                       #'clf__degree': [1,2,3,4,5,7,8,9,10]
-                      'clf__degree': [1,2,3,4,5,7]
+                      'clf__degree': [1,2,3,4,5]
         }
         """parametros = {'clf__kernel': ['linear'],
                       'clf__C': [0.001],
@@ -707,7 +707,8 @@ class ClassifyDocuments(object):
         
         parametros_comuns = {
             'vect__ngram_range': [(1, 1), (1, 2), (1, 3), (1, 4)],
-            'vect__max_features': (None, 1000, 10000, 100000, 200000),
+            'vect__max_features': (1000, 10000, 100000, 200000),
+            #'vect__max_features': [1000]                    ,
             'tfidf__use_idf': (True, False)
         }
         parametros_mesclados = self.mesclar_parametros(parametros_comuns, parametros)
@@ -814,6 +815,7 @@ class ClassifyDocuments(object):
             metodo = getattr(self, 'obter_classificador_'+classificador)
             resultado_tmp, X_train, y_train = self.classificar_com_pipeline(dataset, metodo())
             self.classificar_documentos(self.experimento.idexperimento, self.experimento.melhor_classificador, X_train, y_train)
+            gc.collect()
             
             
             if (resultado_tmp > melhor_resultado):
