@@ -3,8 +3,20 @@ var fill = d3.scale.category20b();
 var w = 1024,
     h = 500;
 
-var max,
-    fontSize;
+var max, fontSize;
+
+var svg, vis;
+
+function reload() {
+    svg = d3.select("#vis")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h);
+
+    vis = svg
+        .append("g")
+        .attr("transform", "translate(" + [w >> 1, h >> 1] + ")");
+}
 
 var layout = d3.layout.cloud()
     .timeInterval(Infinity)
@@ -17,11 +29,7 @@ var layout = d3.layout.cloud()
     })
     .on("end", draw);
 
-var svg = d3.select("#vis").append("svg")
-    .attr("width", w)
-    .attr("height", h);
-
-var vis = svg.append("g").attr("transform", "translate(" + [w >> 1, h >> 1] + ")");
+reload();
 
 if (window.attachEvent) {
     window.attachEvent('onresize', update);
@@ -33,8 +41,6 @@ else if (window.addEventListener) {
 function draw(data, bounds) {
     var w = 1024,
         h = 500;
-
-    // d3.select("svg").remove();
 
     svg.attr("width", w).attr("height", h);
 
@@ -89,6 +95,5 @@ function update() {
         fontSize.domain([+dataWords[dataWords.length - 1].value || 1, +dataWords[0].value]);
     }
 
-    console.dir(dataWords)
     layout.stop().words(dataWords).start();
 }
