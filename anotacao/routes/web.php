@@ -35,3 +35,5 @@ Route::post('/anotar', 'AnotacaoController@registrarAnotacao')->name('anotar')->
 Route::post('/anotardivergente', 'AnotacaoController@registrarAnotacaoDivergente')->name('anotardivergente')->middleware('auth');
 
 Route::get('/orientacao', 'AnotacaoController@orientacao')->name('orientacao')->middleware('auth');
+
+Route::get('/resumo', 'ResumoFinalController@obterResumoEmJson')->name('resumo');

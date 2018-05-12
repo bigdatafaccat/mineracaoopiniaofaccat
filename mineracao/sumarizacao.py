@@ -28,6 +28,7 @@ class Sumarizacao(object):
         
         drop table if exists resumo_final;
         create table resumo_final  (
+            idresumo_final bigserial,
             post_id varchar(255),
             comentario_id varchar(255),
             comentario_comentario_id varchar(255),
@@ -36,6 +37,18 @@ class Sumarizacao(object):
             sentencas_positivas int,
             sentencas_negativas int,
             vale_paranhana boolean
+        ); 
+        
+        
+        drop table if exists resumo_termos;
+        create table resumo_termos (
+            idresumo_termos bigserial,
+            post_id varchar(255),
+            comentario_id varchar(255),
+            comentario_comentario_id varchar(255),
+            sentenca_id varchar(255),
+            termo text,
+            assunto text
         ); 
         
         drop table resumo;
@@ -95,7 +108,7 @@ class Sumarizacao(object):
     
     def reiniciar_resumo(self, assunto):
         sql = """
-        insert into resumo_final select * 
+        insert into resumo_final (post_id, comentario_id, comentario_comentario_id, tipo_texto, assunto, sentencas_positivas, sentencas_negativas, vale_paranhana) (select * 
         from  
         (
         select d.post_id,
@@ -128,10 +141,41 @@ class Sumarizacao(object):
          where d.oqueclassifica = %s
            and d.variavel_dependente = '1'
            group by 1,2,3,4,5,6,7,8
-        ) a
+        ) a)
         """
         parametros = (
                 str(assunto),
+                str(assunto)
+        )
+        self.conexao.executar(sql, parametros)
+        
+        
+    def reiniciar_termos(self, assunto):
+        
+        sql = """
+        insert into resumo_termos (post_id, comentario_id, comentario_comentario_id, sentenca_id, termo, assunto) (select * 
+        from  
+        (
+        select s.post_id,
+               s.comentario_id,
+               s.comentario_comentario_id,
+               s.sentenca_id,
+               replace(lower(p.termo), ',', '') as termo,
+               f.assunto as assunto
+          from resumo_final f
+          
+    inner join sentenca s on (s.post_id = f.post_id and 
+                              s.comentario_id = f.comentario_id and 
+                              s.comentario_comentario_id = f.comentario_comentario_id)
+      inner join part_of_speech p on (p.idsentenca = s.idsentenca)      
+          
+         where p.pos = %s
+           and f.assunto = %s
+           and p.normalizado
+        ) a)
+        """
+        parametros = (
+                'NOUN',
                 str(assunto)
         )
         self.conexao.executar(sql, parametros)
@@ -165,6 +209,8 @@ def main():
     for assunto in assuntos:
         print("Início de resumo de "+assunto+" "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
         sumarizacao.reiniciar_resumo(assunto)
+        print("Resumo de termos "+assunto+" "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+        sumarizacao.reiniciar_termos(assunto)
         print("Fim de resumo de "+assunto+" "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
     
     print("Início do script")
