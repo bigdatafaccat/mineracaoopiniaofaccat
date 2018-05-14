@@ -82,9 +82,7 @@
     $.ajax({
       dataType: "json",
       crossDomain: true,
-      //url: 'https://api.myjson.com/bins/173dm6'
-      //url: 'http://192.168.10.10:8000/resumo'
-      url: 'http://192.168.10.10:8000/resumo'
+      url: 'https://anotacao.datahacker.com.br/resumo'
     }).done(function (data) {
       render(data);
     }).fail(function (request, status, error) {
