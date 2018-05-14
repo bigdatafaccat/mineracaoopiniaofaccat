@@ -51,7 +51,7 @@ class Sumarizacao(object):
             assunto text
         ); 
         
-        drop table resumo;
+        drop table if exists resumo;
         create table resumo as (
           select d.* 
             from documento_classificado d
@@ -187,7 +187,7 @@ def main():
     print(inicio)
     sys.path.append(os.path.abspath("../"))
     from conexao import Conexao
-    lote = 5
+    lote = 6
     algoritmo = 'SVM'
     
     
