@@ -27,7 +27,7 @@ class ResumoFinalController extends Controller
                 'topico' => $assunto,
                 'qntPosts' => $registro->qtd,
                 'qntPositivo' => $registro->qtdpositivas,
-                'qttNegativo' => $registro->qtdnegativas,
+                'qntNegativo' => $registro->qtdnegativas,
                 'porcentagemPositivo' => round((int)$registro->qtdpositivas / (int)$registro->qtd * 100, 2),
                 'porcentagemNegativo' => round((int)$registro->qtdnegativas / (int)$registro->qtd * 100, 2),
                 'palavras' => $termosFormatados
