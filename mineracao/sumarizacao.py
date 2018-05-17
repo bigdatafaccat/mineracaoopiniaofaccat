@@ -60,6 +60,9 @@ class Sumarizacao(object):
              and e.lote_numero = %s
         );
         
+        update resumo set comentario_id = '0' where comentario_id = 'None';
+        update resumo set comentario_comentario_id = '0' where comentario_comentario_id = 'None';
+        
         
         drop index if exists idxsentencaanotada1;
         drop index if exists idxsentencaanotada0;
@@ -92,9 +95,9 @@ class Sumarizacao(object):
                d.variavel_dependente
           from resumo d
     inner join resumo d1 on (d1.post_id = d.post_id and 
-                             d1.comentario_id = d.comentario_id and 
-                             d1.comentario_comentario_id = d.comentario_comentario_id and 
-                             d1.sentenca_id = d.sentenca_id and 
+                             coalesce(d1.comentario_id, '0') = coalesce(d.comentario_id, '0') and 
+                             coalesce(d1.comentario_comentario_id, '0') = coalesce(d.comentario_comentario_id, '0') and 
+                             coalesce(d1.sentenca_id, '0') = coalesce(d.sentenca_id, '0') and 
                              d1.variavel_dependente = '1' and
                              d1.oqueclassifica = 'com_sem_opiniao')
          where d.oqueclassifica = 'opiniao'
@@ -119,23 +122,23 @@ class Sumarizacao(object):
                (select count(*)
                   from resumo_opiniao d1 
                  where d.post_id = d1.post_id 
-                   and d.comentario_id = d1.comentario_id
-                   and d.comentario_comentario_id = d1.comentario_comentario_id
+                   and coalesce(d.comentario_id, '0') = coalesce(d1.comentario_id, '0')
+                   and coalesce(d.comentario_comentario_id, '0') = coalesce(d1.comentario_comentario_id, '0')
                    and d1.variavel_dependente = '1'
                    ) as sentencas_positivas,
                (select count(*)
                   from resumo_opiniao d2 
                  where d.post_id = d2.post_id 
-                   and d.comentario_id = d2.comentario_id
-                   and d.comentario_comentario_id = d2.comentario_comentario_id
+                   and coalesce(d.comentario_id, '0') = coalesce(d2.comentario_id, '0')
+                   and coalesce(d.comentario_comentario_id, '0') = coalesce(d2.comentario_comentario_id, '0')
                    and d2.variavel_dependente = '0'
                    ) as sentencas_negativas,
                case when d3.post_id is null then false else true end as vale_paranhana
                
           from resumo d
      left join resumo d3 on (d3.post_id = d.post_id and 
-                             d3.comentario_id = d.comentario_id and 
-                             d3.comentario_comentario_id = d.comentario_comentario_id and 
+                             coalesce(d3.comentario_id, '0') = coalesce(d.comentario_id, '0') and 
+                             coalesce(d3.comentario_comentario_id, '0') = coalesce(d.comentario_comentario_id, '0') and 
                              d3.variavel_dependente = '1' and
                              d3.oqueclassifica = 'vale_paranhana')
          where d.oqueclassifica = %s
@@ -165,8 +168,8 @@ class Sumarizacao(object):
           from resumo_final f
           
     inner join sentenca s on (s.post_id = f.post_id and 
-                              s.comentario_id = f.comentario_id and 
-                              s.comentario_comentario_id = f.comentario_comentario_id)
+                              coalesce(s.comentario_id, '0') = coalesce(f.comentario_id, '0') and 
+                              coalesce(s.comentario_comentario_id, '0') = coalesce(f.comentario_comentario_id, '0'))
       inner join part_of_speech p on (p.idsentenca = s.idsentenca)      
           
          where p.pos = %s
