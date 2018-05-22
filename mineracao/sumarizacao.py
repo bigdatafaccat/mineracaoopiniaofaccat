@@ -51,6 +51,7 @@ class Sumarizacao(object):
             assunto text
         ); 
         
+        
         drop table if exists resumo;
         create table resumo as (
           select d.* 
@@ -63,12 +64,15 @@ class Sumarizacao(object):
         update resumo set comentario_id = '' where comentario_id = 'None';
         update resumo set comentario_comentario_id = '' where comentario_comentario_id = 'None';
         
-        
+        drop index if exists idxsentencaanotada3;
+        drop index if exists idxsentencaanotada2;
         drop index if exists idxsentencaanotada1;
         drop index if exists idxsentencaanotada0;
         drop index if exists idxsentencaanotadaex;
         
         
+        create index idxsentencaanotada3 on resumo (post_id, comentario_id, comentario_comentario_id);
+        create index idxsentencaanotada2 on resumo (post_id, comentario_id, comentario_comentario_id, sentenca_id);
         create index idxsentencaanotada1 on resumo (post_id, comentario_id, comentario_comentario_id, sentenca_id, oqueclassifica, variavel_dependente) where variavel_dependente = '1';
         create index idxsentencaanotada0 on resumo (post_id, comentario_id, comentario_comentario_id, sentenca_id, oqueclassifica, variavel_dependente) where variavel_dependente = '0';
         create index idxsentencaanotadaex on resumo (idexperimentos_avaliacao_resultado);
@@ -97,7 +101,7 @@ class Sumarizacao(object):
     inner join resumo d1 on (d1.post_id = d.post_id and 
                              coalesce(d1.comentario_id, '') = coalesce(d.comentario_id, '') and 
                              coalesce(d1.comentario_comentario_id, '') = coalesce(d.comentario_comentario_id, '') and 
-                             coalesce(d1.sentenca_id, '0') = coalesce(d.sentenca_id, '0') and 
+                             coalesce(d1.sentenca_id, '') = coalesce(d.sentenca_id, '') and 
                              d1.variavel_dependente = '1' and
                              d1.oqueclassifica = 'com_sem_opiniao')
          where d.oqueclassifica = 'opiniao'
@@ -141,8 +145,12 @@ class Sumarizacao(object):
                              coalesce(d3.comentario_comentario_id, '') = coalesce(d.comentario_comentario_id, '') and 
                              d3.variavel_dependente = '1' and
                              d3.oqueclassifica = 'vale_paranhana')
+     inner join sentenca s on (s.post_id = d.post_id and 
+                              coalesce(s.comentario_id, '') = coalesce(d.comentario_id, '') and 
+                              coalesce(s.comentario_comentario_id, '') = coalesce(d.comentario_comentario_id, ''))
          where d.oqueclassifica = %s
            and d.variavel_dependente = '1'
+           and s.post_datahora::date > '2017-01-01' and s.post_datahora::date < '2017-07-01'
            group by 1,2,3,4,5,6,7,8
         ) a)
         """
@@ -175,6 +183,7 @@ class Sumarizacao(object):
          where p.pos = %s
            and f.assunto = %s
            and p.normalizado
+           and s.post_datahora::date > '2017-01-01' and s.post_datahora::date < '2017-07-01'
         ) a)
         """
         parametros = (
@@ -208,7 +217,7 @@ def main():
     
     
     assuntos = ['saude', 'seguranca', 'educacao']
-    #assuntos = ['saude']
+    #assuntos = ['educacao']
     for assunto in assuntos:
         print("Início de resumo de "+assunto+" "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
         sumarizacao.reiniciar_resumo(assunto)
