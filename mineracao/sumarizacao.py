@@ -36,7 +36,10 @@ class Sumarizacao(object):
             assunto text,
             sentencas_positivas int,
             sentencas_negativas int,
-            vale_paranhana boolean
+            vale_paranhana boolean,
+            autor varchar(255), 
+            grupo_id varchar(255),
+            post_datahora date
         ); 
         
         
@@ -115,7 +118,9 @@ class Sumarizacao(object):
     
     def reiniciar_resumo(self, assunto):
         sql = """
-        insert into resumo_final (post_id, comentario_id, comentario_comentario_id, tipo_texto, assunto, sentencas_positivas, sentencas_negativas, vale_paranhana) (select * 
+        insert into resumo_final (
+        post_id, comentario_id, comentario_comentario_id, tipo_texto, assunto, sentencas_positivas, sentencas_negativas, vale_paranhana, autor, grupo_id, post_datahora
+        ) (select * 
         from  
         (
         select d.post_id,
@@ -137,7 +142,14 @@ class Sumarizacao(object):
                    and coalesce(d.comentario_comentario_id, '') = coalesce(d2.comentario_comentario_id, '')
                    and d2.variavel_dependente = '0'
                    ) as sentencas_negativas,
-               case when d3.post_id is null then false else true end as vale_paranhana
+               case when d3.post_id is null then false else true end as vale_paranhana,
+               case 
+                   when d.tipo_texto = 'post' then s.post_autor_id
+                   when d.tipo_texto = 'comentario' then s.comentario_autor_id
+                   when d.tipo_texto = 'comentario_de_comentario' then s.comentario_comentario_autor_id
+               end as autor,
+               s.grupo_id,
+               s.post_datahora::date as post_datahora
                
           from resumo d
      left join resumo d3 on (d3.post_id = d.post_id and 
@@ -151,7 +163,7 @@ class Sumarizacao(object):
          where d.oqueclassifica = %s
            and d.variavel_dependente = '1'
            and s.post_datahora::date > '2017-01-01' and s.post_datahora::date < '2017-07-01'
-           group by 1,2,3,4,5,6,7,8
+           group by 1,2,3,4,5,6,7,8,9,10,11
         ) a)
         """
         parametros = (

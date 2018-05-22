@@ -68,8 +68,8 @@ class ClassifyDocuments(object):
     flag_classificar_documentos=True
     limite_dados=None
     #classificadores = ['svm', 'naive', 'random_tree', 'SDG', 'xgboost', 'MLP']
-    #classificadores = ['naive', 'random_tree', 'SDG', 'xgboost']
-    classificadores = ['svm']
+    classificadores = ['naive', 'random_tree', 'SDG', 'xgboost']
+    #classificadores = ['svm']
     
     
     
