@@ -814,8 +814,8 @@ class ClassifyDocuments(object):
         for classificador in self.classificadores:
             metodo = getattr(self, 'obter_classificador_'+classificador)
             resultado_tmp, X_train, y_train = self.classificar_com_pipeline(dataset, metodo())
-            self.classificar_documentos(self.experimento.idexperimento, self.experimento.melhor_classificador, X_train, y_train)
-            gc.collect()
+            #self.classificar_documentos(self.experimento.idexperimento, self.experimento.melhor_classificador, X_train, y_train)
+            #gc.collect()
             
             
             if (resultado_tmp > melhor_resultado):
@@ -824,12 +824,13 @@ class ClassifyDocuments(object):
                 melhor_X_train = X_train
                 melhor_y_train = y_train
             print("Classificaria com o "+melhor_experimento.algoritmo)
+            gc.collect()
                 
             
         
-        #print("Classificaria com o "+melhor_experimento.algoritmo)
-        #if (self.flag_classificar_documentos):
-            #self.classificar_documentos(melhor_experimento.idexperimento, melhor_experimento.melhor_classificador, melhor_X_train, melhor_y_train)
+        print("Classificaria com o "+melhor_experimento.algoritmo)
+        if (self.flag_classificar_documentos):
+            self.classificar_documentos(melhor_experimento.idexperimento, melhor_experimento.melhor_classificador, melhor_X_train, melhor_y_train)
         
         gc.collect()
         
@@ -976,7 +977,7 @@ def main():
     lista = ['opiniao', 'com_sem_opiniao', 'saude', 'educacao', 'seguranca', 'vale_paranhana']
     #lista = ['opiniao', 'seguranca', 'vale_paranhana']
     #lista = ['saude', 'educacao', 'seguranca', 'vale_paranhana']
-    #lista = ['seguranca', 'vale_paranhana']
+    #lista = ['vale_paranhana']
     #lista = ['opiniao']
     
     classifyDocuments.obterUltimoLote()
