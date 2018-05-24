@@ -69,6 +69,7 @@ class ClassifyDocuments(object):
     limite_dados=None
     #classificadores = ['svm', 'naive', 'random_tree', 'SDG', 'xgboost', 'MLP']
     classificadores = ['naive', 'random_tree', 'SDG', 'xgboost']
+    #classificadores = ['naive']
     #classificadores = ['svm']
     
     
@@ -749,7 +750,15 @@ class ClassifyDocuments(object):
         y_pred = classificador.predict(X_test)
         
         print("Registrando classificação no banco "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+        inteiro = 1
+        tamanho = len(dataset)
         for indice in range(0, len(dataset)):
+            tmp = int(indice/tamanho*100)
+            if (tmp != inteiro):
+                inteiro = tmp
+                print("Registrando "+str(indice)+" de "+str(tamanho)+"  "+str(inteiro)+"% "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+            
+                
             #string = "sentenca_id %s previsto %s" % (str(dataset['sentenca_id'][indice]), str(y_pred[indice]))
             #print(string)
             
