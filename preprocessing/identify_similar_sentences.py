@@ -25,7 +25,7 @@ print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 #print("Sentenças duplicadas identificadas")
 #print(strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
-cur.execute("SELECT idsentenca,texto FROM sentenca where not similar_outra and not similaridade_analisada and post_datahora::date > '2017-01-01' and post_datahora::date <= '2017-12-31' order by texto limit 2500")
+cur.execute("SELECT idsentenca,texto FROM sentenca where not similar_outra and not similaridade_analisada and post_datahora::date > '2017-01-01' and post_datahora::date <= '2017-06-30' order by texto")
 
 result = cur.fetchall()
 conn.commit()

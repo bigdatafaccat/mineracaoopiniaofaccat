@@ -23,7 +23,7 @@ import json
 class Sumarizacao(object):
     conexao = None
     
-    def recriar_resumo_geral(self, algoritmo, lote):
+    def recriar_resumo_geral(self, lote):
         sql = """
         
         drop table if exists resumo_final;
@@ -55,13 +55,16 @@ class Sumarizacao(object):
         ); 
         
         
-        drop table if exists resumo;
+        drop table if exists resumo;"""
+        self.conexao.executar(sql)
+        
+        
+        sql = """
         create table resumo as (
           select d.* 
             from documento_classificado d
       inner join experimentos_avaliacao_resultado e on (e.idexperimentos_avaliacao_resultado = d.idexperimentos_avaliacao_resultado)
-           where e.algoritmo = %s
-             and e.lote_numero = %s
+           where e.lote_numero = """+str(lote)+"""
         );
         
         update resumo set comentario_id = '' where comentario_id = 'None';
@@ -81,11 +84,7 @@ class Sumarizacao(object):
         create index idxsentencaanotadaex on resumo (idexperimentos_avaliacao_resultado);
         
         """
-        parametros = (
-                str(algoritmo),
-                str(lote)
-        )
-        self.conexao.executar(sql, parametros)
+        self.conexao.executar(sql)
         
         
     def reiniciar_resumo_opiniao(self):
@@ -211,7 +210,8 @@ def main():
     print(inicio)
     sys.path.append(os.path.abspath("../"))
     from conexao import Conexao
-    lote = 6
+    #lote = 6
+    lote = 24
     algoritmo = 'SVM'
     
     
@@ -220,7 +220,7 @@ def main():
     
     
     print("Recriando resumo geral "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
-    sumarizacao.recriar_resumo_geral(algoritmo, lote)
+    sumarizacao.recriar_resumo_geral(lote)
     print("Resumo geral recriado "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
     
     print("Recriando resumo de opinião "+strftime("%Y-%m-%d %H:%M:%S", gmtime()))
